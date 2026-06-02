@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏀 MODO CLUTCH</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+:root {
+  --orange:#FF6B00;--orange-light:#FF8C38;--black:#0A0A0A;--black-2:#111;
+  --black-3:#1A1A1A;--black-4:#242424;--white:#F5F5F0;--white-dim:rgba(245,245,240,0.65);
+  --blue:#1E6FD9;--green:#2ECC71;--yellow:#F1C40F;--red:#E74C3C;
+  --fd:'Black Ops One',cursive;--fc:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;min-height:100%;background:var(--black);color:var(--white);font-family:var(--fb);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,107,0,.12) 0%,transparent 60%),
+  radial-gradient(ellipse 60% 40% at 80% 100%,rgba(30,111,217,.08) 0%,transparent 60%),
+  repeating-linear-gradient(0deg,transparent,transparent 48px,rgba(255,255,255,.015) 48px,rgba(255,255,255,.015) 49px),
+  repeating-linear-gradient(90deg,transparent,transparent 48px,rgba(255,255,255,.015) 48px,rgba(255,255,255,.015) 49px);
+  pointer-events:none;z-index:0}
+#app{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.screen{display:none;width:100%;max-width:720px;animation:fsIn .45s cubic-bezier(.22,.68,0,1.2) both}
+.screen.active{display:block}
+@keyframes fsIn{from{opacity:0;transform:translateY(32px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* ── SHARED ── */
+.card{background:var(--black-3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:28px 32px}
+.divider{width:60px;height:3px;background:linear-gradient(90deg,var(--orange),transparent);border-radius:99px;margin:14px 0}
+.divider.center{margin-left:auto;margin-right:auto}
+.progress-wrap{margin-bottom:18px}
+.progress-label{display:flex;justify-content:space-between;font-family:var(--fc);font-size:.78rem;letter-spacing:.08em;color:var(--white-dim);margin-bottom:6px}
+.progress-bar{height:4px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange-light));border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.q-round-badge{font-family:var(--fd);font-size:.8rem;color:var(--orange);background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.3);padding:4px 11px;border-radius:6px;white-space:nowrap}
+.question-text{font-family:var(--fc);font-weight:700;font-size:clamp(1.25rem,4vw,1.65rem);line-height:1.25;margin:18px 0 20px;color:var(--white)}
+
+/* ── TIMER ── */
+.timer-wrap{display:flex;align-items:center;justify-content:center;margin:14px 0}
+.timer-ring{position:relative;width:80px;height:80px}
+.timer-svg{transform:rotate(-90deg)}
+.timer-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:6}
+.timer-arc{fill:none;stroke:var(--orange);stroke-width:6;stroke-linecap:round;stroke-dasharray:201;stroke-dashoffset:0;transition:stroke .3s}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.6rem}
+.timer-arc.warn{stroke:var(--yellow)}.timer-arc.danger{stroke:var(--red)}
+.pulse-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--orange);animation:pulsate 1s ease-out infinite;opacity:0;display:none}
+@keyframes pulsate{0%{transform:scale(.9);opacity:.7}100%{transform:scale(1.4);opacity:0}}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border:none;border-radius:10px;font-family:var(--fc);font-weight:700;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;user-select:none}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--orange);color:#000;box-shadow:0 4px 24px rgba(255,107,0,.35);font-size:1.15rem;padding:17px 38px}
+.btn-primary:hover{box-shadow:0 6px 32px rgba(255,107,0,.5);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--white-dim);border:1px solid rgba(255,255,255,.15);font-size:.9rem;padding:11px 22px}
+.btn-ghost:hover{border-color:rgba(255,255,255,.35);color:var(--white)}
+.btn-answer{width:100%;background:var(--black-4);color:var(--white);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:17px 20px;font-size:.97rem;text-transform:none;letter-spacing:.01em;text-align:left;margin-bottom:10px;line-height:1.3;transition:background .2s,border-color .2s,transform .15s;cursor:pointer;font-family:var(--fb)}
+.btn-answer:hover{background:rgba(255,107,0,.12);border-color:var(--orange);transform:translateX(4px)}
+
+/* ── SEMÁFORO ── */
+.semaforo-wrap{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px}
+.btn-sem{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px 10px;border:none;border-radius:14px;font-family:var(--fc);font-weight:900;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:transform .15s,box-shadow .2s}
+.btn-sem span{font-size:1.8rem}
+.btn-sem:hover{transform:translateY(-3px)}
+.btn-sem:active{transform:scale(.95)}
+.btn-sem-green{background:rgba(46,204,113,.15);color:var(--green);border:2px solid var(--green)}
+.btn-sem-yellow{background:rgba(241,196,15,.12);color:var(--yellow);border:2px solid var(--yellow)}
+.btn-sem-red{background:rgba(231,76,60,.13);color:var(--red);border:2px solid var(--red)}
+.btn-sem-green:hover{box-shadow:0 0 20px rgba(46,204,113,.3)}
+.btn-sem-yellow:hover{box-shadow:0 0 20px rgba(241,196,15,.3)}
+.btn-sem-red:hover{box-shadow:0 0 20px rgba(231,76,60,.3)}
+
+/* ── DUELO ── */
+.duelo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+.btn-duelo{display:flex;align-items:center;justify-content:center;padding:28px 16px;border:2px solid rgba(255,255,255,.12);border-radius:14px;background:var(--black-4);color:var(--white);font-family:var(--fc);font-weight:900;font-size:1.05rem;letter-spacing:.03em;text-transform:uppercase;text-align:center;line-height:1.25;cursor:pointer;transition:background .2s,border-color .2s,transform .15s,box-shadow .2s}
+.btn-duelo:hover{background:rgba(255,107,0,.18);border-color:var(--orange);transform:scale(1.03);box-shadow:0 4px 20px rgba(255,107,0,.25)}
+.vs-label{display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.4rem;color:var(--orange);padding:8px 0;grid-column:1/-1}
+
+/* ── SPLASH ── */
+#screen-splash{text-align:center}
+.splash-icon{font-size:clamp(4rem,12vw,7rem);display:block;margin-bottom:12px;animation:bounce 2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.splash-title{font-family:var(--fd);font-size:clamp(2.8rem,8vw,5rem);color:var(--orange);text-shadow:0 0 40px rgba(255,107,0,.4);line-height:1;margin-bottom:8px}
+.splash-sub{font-family:var(--fc);font-size:clamp(1rem,3vw,1.2rem);color:var(--white-dim);letter-spacing:.05em;margin-bottom:32px;line-height:1.5}
+
+/* ── MENU SELECTOR ── */
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.menu-card{background:var(--black-3);border:2px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 16px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;text-align:left;position:relative;overflow:hidden}
+.menu-card:hover{border-color:var(--orange);background:rgba(255,107,0,.07);transform:translateY(-2px)}
+.menu-card:active{transform:scale(.97)}
+.menu-card .mc-num{font-family:var(--fd);font-size:1.8rem;color:var(--orange);line-height:1}
+.menu-card .mc-name{font-family:var(--fc);font-weight:700;font-size:.95rem;letter-spacing:.05em;text-transform:uppercase;color:var(--white);margin-top:4px}
+.menu-card .mc-desc{font-size:.75rem;color:var(--white-dim);margin-top:4px}
+.menu-card .mc-time{position:absolute;top:12px;right:12px;font-family:var(--fc);font-size:.7rem;background:rgba(255,107,0,.15);color:var(--orange);padding:3px 8px;border-radius:99px;border:1px solid rgba(255,107,0,.3)}
+.menu-all{background:var(--orange);border:none;border-radius:14px;padding:18px 24px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:box-shadow .2s,transform .15s;width:100%;margin-bottom:12px}
+.menu-all:hover{box-shadow:0 6px 28px rgba(255,107,0,.45);transform:translateY(-2px)}
+.menu-all .ma-left{text-align:left}
+.menu-all .ma-icon{font-size:1.8rem}
+.menu-all .ma-name{font-family:var(--fd);font-size:1.2rem;color:#000;line-height:1}
+.menu-all .ma-desc{font-family:var(--fc);font-size:.78rem;color:rgba(0,0,0,.65);letter-spacing:.05em;text-transform:uppercase;margin-top:3px}
+.section-label{font-family:var(--fc);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--white-dim);margin-bottom:12px;margin-top:8px}
+
+/* ── ROUND TRANSITION ── */
+.round-transition{text-align:center}
+.rt-number{font-family:var(--fd);font-size:clamp(4rem,14vw,7rem);color:var(--orange);line-height:1;text-shadow:0 0 60px rgba(255,107,0,.3)}
+.rt-title{font-family:var(--fd);font-size:clamp(1.4rem,5vw,2.3rem);color:var(--white);margin-top:4px}
+.rt-subtitle{font-family:var(--fc);font-size:1rem;letter-spacing:.1em;color:var(--white-dim);text-transform:uppercase;margin-top:10px;margin-bottom:28px}
+
+/* ── COUNTDOWN ── */
+#countdownOverlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.88);align-items:center;justify-content:center;flex-direction:column;gap:12px}
+#countdownOverlay.visible{display:flex}
+.countdown-num{font-family:var(--fd);font-size:clamp(5rem,20vw,10rem);color:var(--orange);animation:popIn .6s cubic-bezier(.17,.67,.4,1.4)}
+@keyframes popIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.countdown-sub{font-family:var(--fc);font-size:1.1rem;letter-spacing:.15em;text-transform:uppercase;color:var(--white-dim)}
+
+/* ── RESULT SCREENS ── */
+.result-title{font-family:var(--fd);font-size:clamp(1.6rem,5vw,2.5rem);color:var(--orange);text-align:center;margin-bottom:6px}
+.result-icon{font-size:2.8rem;text-align:center;display:block;margin-bottom:8px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.stat-box{background:var(--black-4);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px 14px;text-align:center}
+.stat-num{font-family:var(--fd);font-size:2.1rem;color:var(--orange);line-height:1}
+.stat-label{font-family:var(--fc);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--white-dim);margin-top:4px}
+.semaforo-result{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.sem-res{flex:1;background:var(--black-4);border-radius:12px;padding:14px 8px;text-align:center;border:2px solid transparent}
+.sem-res.green{border-color:var(--green)}.sem-res.yellow{border-color:var(--yellow)}.sem-res.red{border-color:var(--red)}
+.sem-res .emoji{font-size:1.5rem}.sem-res .count{font-family:var(--fd);font-size:1.8rem;color:var(--white)}.sem-res .name{font-family:var(--fc);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--white-dim)}
+.reflexion-title{font-family:var(--fc);font-weight:900;font-size:.88rem;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;margin-top:20px}
+.reflexion-q{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:var(--black-4);border-radius:10px;margin-bottom:7px;border-left:3px solid var(--orange)}
+.reflexion-q .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);margin-top:6px;flex-shrink:0}
+.reflexion-q p{font-size:.9rem;color:var(--white-dim);line-height:1.5}
+.round-result-header{background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.25);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-family:var(--fc);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--orange)}
+.btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+
+/* ── FINAL TABS ── */
+.tabs{display:flex;gap:6px;margin-bottom:18px;background:var(--black-4);padding:5px;border-radius:10px}
+.tab{flex:1;padding:9px 10px;border:none;border-radius:7px;background:transparent;color:var(--white-dim);font-family:var(--fc);font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s}
+.tab.active{background:var(--orange);color:#000}
+
+/* ── FLASH ── */
+@keyframes flashPulse{0%{opacity:1}50%{opacity:.3}100%{opacity:1}}
+.flash{animation:flashPulse .3s ease}
+
+@media(max-width:480px){
+  .duelo-wrap{grid-template-columns:1fr}
+  .menu-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .card{padding:18px 16px}
+  .semaforo-wrap{gap:8px}
+  .btn-sem span{font-size:1.4rem}
+  .btn-row{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<div id="countdownOverlay">
+  <div class="countdown-num" id="countdownNum">3</div>
+  <div class="countdown-sub">Preparate</div>
+</div>
+
+<div id="app">
+
+<!-- ══════════════════ SPLASH / MENÚ ══════════════════ -->
+<div id="screen-splash" class="screen active">
+  <span class="splash-icon">🏀</span>
+  <h1 class="splash-title">MODO CLUTCH</h1>
+  <div class="divider center"></div>
+  <p class="splash-sub">¿Qué hacés cuando<br>el partido depende de vos?</p>
+
+  <button class="menu-all" onclick="playAll()">
+    <div class="ma-left">
+      <div class="ma-name">JUGAR TODO JUNTO</div>
+      <div class="ma-desc">Las 4 rondas completas</div>
+    </div>
+    <div class="ma-icon">🔥</div>
+  </button>
+
+  <div class="section-label">— O elegí una ronda —</div>
+
+  <div class="menu-grid">
+    <div class="menu-card" onclick="playSingle(1)">
+      <div class="mc-time">3 seg</div>
+      <div class="mc-num">01</div>
+      <div class="mc-name">Decisión Instantánea</div>
+      <div class="mc-desc">15 preguntas · respuesta rápida</div>
+    </div>
+    <div class="menu-card" onclick="playSingle(2)">
+      <div class="mc-time">5 seg</div>
+      <div class="mc-num">02</div>
+      <div class="mc-name">Bajo Presión</div>
+      <div class="mc-desc">15 situaciones · presión real</div>
+    </div>
+    <div class="menu-card" onclick="playSingle(3)">
+      <div class="mc-num">03</div>
+      <div class="mc-name">Semáforo</div>
+      <div class="mc-desc">20 situaciones · ¿lo harías?</div>
+    </div>
+    <div class="menu-card" onclick="playSingle(4)">
+      <div class="mc-num">04</div>
+      <div class="mc-name">Elegí Ya</div>
+      <div class="mc-desc">10 duelos · sin tiempo</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ ROUND TRANSITIONS ══════════════════ -->
+<div id="screen-rt1" class="screen">
+  <div class="round-transition">
+    <div class="rt-number">01</div>
+    <div class="rt-title">DECISIÓN INSTANTÁNEA</div>
+    <div class="rt-subtitle">Tenés 3 segundos para decidir</div>
+    <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(1)">¡ARRANCAMOS!</button></div>
+  </div>
+</div>
+<div id="screen-rt2" class="screen">
+  <div class="round-transition">
+    <div class="rt-number">02</div>
+    <div class="rt-title">BAJO PRESIÓN</div>
+    <div class="rt-subtitle">Situaciones reales · 5 segundos</div>
+    <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(2)">¡ARRANCAMOS!</button></div>
+  </div>
+</div>
+<div id="screen-rt3" class="screen">
+  <div class="round-transition">
+    <div class="rt-number">03</div>
+    <div class="rt-title">SEMÁFORO DEL DEPORTISTA</div>
+    <div class="rt-subtitle">¿Lo harías o no?</div>
+    <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(3)">¡ARRANCAMOS!</button></div>
+  </div>
+</div>
+<div id="screen-rt4" class="screen">
+  <div class="round-transition">
+    <div class="rt-number">04</div>
+    <div class="rt-title">ELEGÍ YA</div>
+    <div class="rt-subtitle">Sin tiempo para pensar</div>
+    <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(4)">¡ARRANCAMOS!</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════ RONDA 1 ══════════════════ -->
+<div id="screen-r1" class="screen">
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span class="q-round-badge">R01 · DECISIÓN INSTANTÁNEA</span>
+      <span id="r1-counter">1/15</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="r1-progress" style="width:0%"></div></div>
+  </div>
+  <div class="timer-wrap">
+    <div class="timer-ring">
+      <div class="pulse-ring" id="r1-pulse"></div>
+      <svg class="timer-svg" width="80" height="80" viewBox="0 0 80 80">
+        <circle class="timer-track" cx="40" cy="40" r="32"/>
+        <circle class="timer-arc" id="r1-arc" cx="40" cy="40" r="32"/>
+      </svg>
+      <div class="timer-num" id="r1-timer">3</div>
+    </div>
+  </div>
+  <p id="r1-question" class="question-text"></p>
+  <div id="r1-options"></div>
+</div>
+
+<!-- ══════════════════ RONDA 2 ══════════════════ -->
+<div id="screen-r2" class="screen">
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span class="q-round-badge">R02 · BAJO PRESIÓN</span>
+      <span id="r2-counter">1/15</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="r2-progress" style="width:0%"></div></div>
+  </div>
+  <div class="timer-wrap">
+    <div class="timer-ring">
+      <div class="pulse-ring" id="r2-pulse"></div>
+      <svg class="timer-svg" width="80" height="80" viewBox="0 0 80 80">
+        <circle class="timer-track" cx="40" cy="40" r="32"/>
+        <circle class="timer-arc" id="r2-arc" cx="40" cy="40" r="32"/>
+      </svg>
+      <div class="timer-num" id="r2-timer">5</div>
+    </div>
+  </div>
+  <p id="r2-question" class="question-text"></p>
+  <div id="r2-options"></div>
+</div>
+
+<!-- ══════════════════ RONDA 3 ══════════════════ -->
+<div id="screen-r3" class="screen">
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span class="q-round-badge">R03 · SEMÁFORO</span>
+      <span id="r3-counter">1/20</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="r3-progress" style="width:0%"></div></div>
+  </div>
+  <p class="question-text" id="r3-question"></p>
+  <div class="semaforo-wrap">
+    <button class="btn-sem btn-sem-green"  onclick="answerSemaforo('green')"><span>🟢</span>LO HARÍA</button>
+    <button class="btn-sem btn-sem-yellow" onclick="answerSemaforo('yellow')"><span>🟡</span>LO PENSARÍA</button>
+    <button class="btn-sem btn-sem-red"    onclick="answerSemaforo('red')"><span>🔴</span>NO LO HARÍA</button>
+  </div>
+</div>
+
+<!-- ══════════════════ RONDA 4 ══════════════════ -->
+<div id="screen-r4" class="screen">
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span class="q-round-badge">R04 · ELEGÍ YA</span>
+      <span id="r4-counter">1/10</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="r4-progress" style="width:0%"></div></div>
+  </div>
+  <div id="r4-duelo-wrap"></div>
+</div>
+
+<!-- ══════════════════ RESULTADOS POR RONDA ══════════════════ -->
+<div id="screen-res1" class="screen">
+  <span class="result-icon">⚡</span>
+  <div class="result-title">RONDA 01 COMPLETADA</div>
+  <div class="round-result-header">DECISIÓN INSTANTÁNEA · 15 preguntas · 3 segundos</div>
+  <div class="divider center"></div>
+  <div class="stats-grid" id="res1-stats"></div>
+  <div class="reflexion-title">🧠 Para reflexionar</div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿En qué preguntas dudaste más?</p></div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Cuándo fue más fácil decidir rápido?</p></div>
+  <div class="btn-row" id="res1-btns"></div>
+</div>
+
+<div id="screen-res2" class="screen">
+  <span class="result-icon">🔥</span>
+  <div class="result-title">RONDA 02 COMPLETADA</div>
+  <div class="round-result-header">BAJO PRESIÓN · 15 situaciones · 5 segundos</div>
+  <div class="divider center"></div>
+  <div class="stats-grid" id="res2-stats"></div>
+  <div class="reflexion-title">🧠 Para reflexionar</div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Qué situación te generó más duda?</p></div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Hubo alguna respuesta que te sorprendió?</p></div>
+  <div class="btn-row" id="res2-btns"></div>
+</div>
+
+<div id="screen-res3" class="screen">
+  <span class="result-icon">🚦</span>
+  <div class="result-title">RONDA 03 COMPLETADA</div>
+  <div class="round-result-header">SEMÁFORO DEL DEPORTISTA · 20 situaciones</div>
+  <div class="divider center"></div>
+  <div class="semaforo-result">
+    <div class="sem-res green"><div class="emoji">🟢</div><div class="count" id="sem-green-res">0</div><div class="name">Lo haría</div></div>
+    <div class="sem-res yellow"><div class="emoji">🟡</div><div class="count" id="sem-yellow-res">0</div><div class="name">Lo pensaría</div></div>
+    <div class="sem-res red"><div class="emoji">🔴</div><div class="count" id="sem-red-res">0</div><div class="name">No lo haría</div></div>
+  </div>
+  <div class="reflexion-title">🧠 Para reflexionar</div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Qué tendencias ves en tus respuestas?</p></div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Hay algo que te gustaría cambiar?</p></div>
+  <div class="btn-row" id="res3-btns"></div>
+</div>
+
+<div id="screen-res4" class="screen">
+  <span class="result-icon">⚔️</span>
+  <div class="result-title">RONDA 04 COMPLETADA</div>
+  <div class="round-result-header">ELEGÍ YA · 10 duelos</div>
+  <div class="divider center"></div>
+  <div class="stats-grid" id="res4-stats"></div>
+  <div class="reflexion-title">🧠 Para reflexionar</div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Qué duelo fue el más difícil?</p></div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Qué dice de vos lo que elegiste?</p></div>
+  <div class="btn-row" id="res4-btns"></div>
+</div>
+
+<!-- ══════════════════ REPORTE FINAL COMPLETO ══════════════════ -->
+<div id="screen-final" class="screen">
+  <span class="result-icon">🏆</span>
+  <div class="result-title">REPORTE CLUTCH COMPLETO</div>
+  <div class="divider center"></div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('general')">General</button>
+    <button class="tab" onclick="switchTab('r1')">R01</button>
+    <button class="tab" onclick="switchTab('r2')">R02</button>
+    <button class="tab" onclick="switchTab('r3')">R03</button>
+    <button class="tab" onclick="switchTab('r4')">R04</button>
+  </div>
+
+  <div id="tab-general">
+    <div class="stats-grid" id="final-stats-general"></div>
+    <div class="semaforo-result" id="final-sem"></div>
+  </div>
+  <div id="tab-r1" style="display:none"><div class="round-result-header">DECISIÓN INSTANTÁNEA</div><div class="stats-grid" id="final-stats-r1"></div></div>
+  <div id="tab-r2" style="display:none"><div class="round-result-header">BAJO PRESIÓN</div><div class="stats-grid" id="final-stats-r2"></div></div>
+  <div id="tab-r3" style="display:none"><div class="round-result-header">SEMÁFORO DEL DEPORTISTA</div><div class="semaforo-result" id="final-sem-r3" style="margin-top:0"></div></div>
+  <div id="tab-r4" style="display:none"><div class="round-result-header">ELEGÍ YA</div><div class="stats-grid" id="final-stats-r4"></div></div>
+
+  <div class="reflexion-title">🧠 Preguntas de Reflexión</div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Dónde decidiste con más facilidad?</p></div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Dónde dudaste más?</p></div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Qué te hizo dudar?</p></div>
+  <div class="reflexion-q"><div class="dot"></div><p>¿Qué descubriste sobre vos?</p></div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="resetGame()">🔄 VOLVER A JUGAR</button>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+/* ════════════════════════════════
+   DATA
+════════════════════════════════ */
+const DATA = {
+  r1: { time:3, questions:[
+    {q:"¿Último tiro o última asistencia?",a:["🏀 Último tiro","🤝 Última asistencia"]},
+    {q:"¿Ser capitán o goleador del equipo?",a:["🏅 Capitán","⭐ Goleador"]},
+    {q:"¿Entrenar solo o entrenar con un compañero mejor que vos?",a:["🎯 Solo","💪 Con uno mejor"]},
+    {q:"¿Ganar un campeonato o ser MVP?",a:["🏆 Campeonato","🥇 MVP"]},
+    {q:"¿Entrenar 2 horas o 1 hora con máxima calidad?",a:["⏱ 2 horas","⚡ 1h máxima calidad"]},
+    {q:"¿Corregir un error técnico o mejorar tu mentalidad?",a:["🔧 Error técnico","🧠 Mentalidad"]},
+    {q:"¿Jugar en un equipo donde sos figura o donde competís por minutos?",a:["⭐ Soy figura","🔥 Compito por minutos"]},
+    {q:"¿Meter un triple o hacer una gran defensa?",a:["🎯 Triple","🛡 Gran defensa"]},
+    {q:"¿Tener más talento o más disciplina?",a:["✨ Talento","📅 Disciplina"]},
+    {q:"¿Ganar por uno o perder por uno jugando excelente?",a:["🏆 Ganar por uno","💎 Perder jugando excelente"]},
+    {q:"¿Escuchar al entrenador o seguir tu instinto?",a:["👂 Entrenador","⚡ Mi instinto"]},
+    {q:"¿Arriesgar o jugar seguro?",a:["🎲 Arriesgar","🛡 Jugar seguro"]},
+    {q:"¿Ser rápido o ser inteligente?",a:["⚡ Rápido","🧠 Inteligente"]},
+    {q:"¿Jugar todo el partido o cerrar los últimos dos minutos?",a:["⏱ Todo el partido","🔥 Últimos 2 min"]},
+    {q:"¿Tener confianza o concentración perfecta?",a:["💪 Confianza","🎯 Concentración perfecta"]},
+  ]},
+  r2: { time:5, questions:[
+    {q:"Quedan 5 segundos. ¿Atacás el aro o tirás de tres?",a:["🏃 Ataco el aro","🎯 Tiro de tres"]},
+    {q:"Vas 0 de 7 en tiros. ¿Seguís lanzando o cambiás tu juego?",a:["🏀 Sigo lanzando","🔄 Cambio mi juego"]},
+    {q:"Un rival te provoca. ¿Ignorás o respondés?",a:["😶 Ignoro","💬 Respondo"]},
+    {q:"Tu entrenador te reta delante de todos. ¿Preguntás después o lo dejás pasar?",a:["💬 Pregunto después","🤐 Lo dejo pasar"]},
+    {q:"Te cobran una falta injusta. ¿Hablás o seguís jugando?",a:["🗣 Hablo","▶ Sigo jugando"]},
+    {q:"Estás agotado. ¿Pedís cambio o seguís?",a:["🔄 Pido cambio","💪 Sigo"]},
+    {q:"Tu compañero está solo y vos venís encendido. ¿Pasás o tirás?",a:["🤝 Paso","🏀 Tiro"]},
+    {q:"Erraste el tiro anterior. ¿Pedís la siguiente pelota o esperás?",a:["🙋 Pido la pelota","⏳ Espero"]},
+    {q:"Te quedan dos faltas para quedar afuera. ¿Defendés igual o más conservador?",a:["🛡 Igual que siempre","⚠ Más conservador"]},
+    {q:"Tu equipo pierde por mucho. ¿Seguís compitiendo igual o bajás un poco?",a:["🔥 Compito igual","📉 Bajo un poco"]},
+    {q:"Entrás desde el banco faltando dos minutos. ¿Buscás protagonismo o hacés lo simple?",a:["⭐ Busco protagonismo","✅ Hago lo simple"]},
+    {q:"Sentís nervios antes del partido. ¿Lo contás o te lo guardás?",a:["💬 Lo cuento","🤐 Me lo guardo"]},
+    {q:"Te duele algo físicamente. ¿Avisás o seguís?",a:["🚨 Aviso","💪 Sigo"]},
+    {q:"El árbitro te tiene entre ojos. ¿Te adaptás o protestás?",a:["🧘 Me adapto","🗣 Protesto"]},
+    {q:"El entrenador cambia una jugada que te gustaba. ¿Aceptás o insistís?",a:["✅ Acepto","💬 Insisto"]},
+  ]},
+  r3:[
+    "Entrenar un día que no tengo ganas.",
+    "Pedir ayuda cuando estoy trabado.",
+    "Llegar 20 minutos antes.",
+    "Quedarme practicando después.",
+    "Reconocer un error delante del equipo.",
+    "Hablar con el entrenador sobre algo que me preocupa.",
+    "Tirar el último lanzamiento.",
+    "Defender al mejor rival.",
+    "Levantar a un compañero que está jugando mal.",
+    "Mirar un video de mis errores.",
+    "Llevar un registro de hábitos.",
+    "Dejar el celular una hora antes de dormir.",
+    "Entrenar aunque llueva.",
+    "Jugar en una posición que no me gusta.",
+    "Aceptar que otro compañero está mejor hoy.",
+    "Volver a intentarlo después de una mala actuación.",
+    "Levantarme temprano para entrenar.",
+    "Cambiar un hábito que me perjudica.",
+    "Ser suplente sin dejar de esforzarme.",
+    "Competir contra alguien mejor que yo.",
+  ],
+  r4:[
+    ["¿Fracasar?","¿Ganar?"],
+    ["¿Talento?","¿Constancia?"],
+    ["¿Entrenador exigente?","¿Motivador?"],
+    ["¿Confianza?","¿Disciplina?"],
+    ["¿Entrenar más?","¿Pensar mejor?"],
+    ["¿Esperar?","¿Actuar?"],
+    ["¿Cabeza?","¿Habilidad?"],
+    ["¿Actitud?","¿Resultado?"],
+    ["¿Valiente?","¿Perfecto?"],
+    ["¿Lo que hacés al ganar?","¿Lo que hacés al perder?"],
+  ]
+};
+
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+let G = {};
+
+function resetG() {
+  G = {
+    mode: null,           // 'all' | 'single'
+    singleRound: null,    // 1-4
+    currentQ: 0,
+    timerInterval: null,
+    questionStart: 0,
+    // per-round stats
+    r1: { times:[], decisions:0 },
+    r2: { times:[], decisions:0 },
+    r3: { times:[], decisions:0, green:0, yellow:0, red:0 },
+    r4: { times:[], decisions:0 },
+  };
+}
+resetG();
+
+/* ════════════════════════════════
+   SCREENS
+════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ════════════════════════════════
+   COUNTDOWN
+════════════════════════════════ */
+function showCountdown(from, cb) {
+  const ov = document.getElementById('countdownOverlay');
+  const numEl = document.getElementById('countdownNum');
+  ov.classList.add('visible');
+  let n = from;
+  numEl.textContent = n;
+  const t = setInterval(() => {
+    n--;
+    if (n <= 0) { clearInterval(t); ov.classList.remove('visible'); cb(); }
+    else {
+      numEl.textContent = n;
+      numEl.style.animation = 'none'; void numEl.offsetWidth;
+      numEl.style.animation = 'popIn .6s cubic-bezier(.17,.67,.4,1.4)';
+    }
+  }, 800);
+}
+
+/* ════════════════════════════════
+   GAME FLOW
+════════════════════════════════ */
+function playAll() {
+  resetG();
+  G.mode = 'all';
+  showScreen('rt1');
+}
+
+function playSingle(n) {
+  resetG();
+  G.mode = 'single';
+  G.singleRound = n;
+  showScreen('rt' + n);
+}
+
+function startRound(n) {
+  G.currentQ = 0;
+  showCountdown(3, () => {
+    showScreen('r' + n);
+    if (n===1) nextQ_r1();
+    if (n===2) nextQ_r2();
+    if (n===3) nextQ_r3();
+    if (n===4) nextQ_r4();
+  });
+}
+
+function resetGame() { resetG(); showScreen('splash'); }
+
+function afterRound(n) {
+  stopTimer();
+  if (G.mode === 'single') {
+    // show individual result
+    buildSingleResult(n);
+    showScreen('res' + n);
+  } else {
+    // all mode: go to next round transition or final
+    if (n < 4) showScreen('rt' + (n+1));
+    else buildFinalReport();
+  }
+}
+
+/* ════════════════════════════════
+   TIMER
+════════════════════════════════ */
+function startTimer(seconds, arcId, numId, pulseId, onEnd) {
+  stopTimer();
+  const arc   = document.getElementById(arcId);
+  const numEl = document.getElementById(numId);
+  const pulse = pulseId ? document.getElementById(pulseId) : null;
+  const circ  = 201;
+  let t = seconds;
+  arc.style.strokeDashoffset = 0;
+  arc.className = 'timer-arc';
+  numEl.textContent = t;
+  if (pulse) pulse.style.display = 'none';
+  G.questionStart = Date.now();
+  G.timerInterval = setInterval(() => {
+    t -= 0.1;
+    arc.style.strokeDashoffset = circ * (1 - t/seconds);
+    const r = Math.ceil(t);
+    numEl.textContent = r > 0 ? r : 0;
+    if (t <= seconds*.5) arc.className = 'timer-arc warn';
+    if (t <= seconds*.25) { arc.className = 'timer-arc danger'; if(pulse) pulse.style.display='block'; }
+    if (t <= 0) { clearInterval(G.timerInterval); onEnd(); }
+  }, 100);
+}
+
+function stopTimer() { clearInterval(G.timerInterval); }
+
+function recordTime(round) {
+  const elapsed = (Date.now() - G.questionStart) / 1000;
+  G['r'+round].times.push(elapsed);
+  G['r'+round].decisions++;
+}
+
+/* ════════════════════════════════
+   RONDA 1
+════════════════════════════════ */
+function nextQ_r1() {
+  const qs = DATA.r1.questions;
+  if (G.currentQ >= qs.length) { afterRound(1); return; }
+  const q = qs[G.currentQ], total = qs.length;
+  document.getElementById('r1-counter').textContent = `${G.currentQ+1}/${total}`;
+  document.getElementById('r1-progress').style.width = `${(G.currentQ/total)*100}%`;
+  document.getElementById('r1-question').textContent = q.q;
+  const opts = document.getElementById('r1-options'); opts.innerHTML='';
+  q.a.forEach(ans => {
+    const b = document.createElement('button'); b.className='btn btn-answer'; b.textContent=ans;
+    b.onclick = ()=>{ stopTimer(); recordTime(1); G.currentQ++; nextQ_r1(); };
+    opts.appendChild(b);
+  });
+  startTimer(DATA.r1.time,'r1-arc','r1-timer','r1-pulse',()=>{ recordTime(1); G.currentQ++; nextQ_r1(); });
+}
+
+/* ════════════════════════════════
+   RONDA 2
+════════════════════════════════ */
+function nextQ_r2() {
+  const qs = DATA.r2.questions;
+  if (G.currentQ >= qs.length) { afterRound(2); return; }
+  const q = qs[G.currentQ], total = qs.length;
+  document.getElementById('r2-counter').textContent = `${G.currentQ+1}/${total}`;
+  document.getElementById('r2-progress').style.width = `${(G.currentQ/total)*100}%`;
+  document.getElementById('r2-question').textContent = q.q;
+  const opts = document.getElementById('r2-options'); opts.innerHTML='';
+  q.a.forEach(ans => {
+    const b = document.createElement('button'); b.className='btn btn-answer'; b.textContent=ans;
+    b.onclick = ()=>{ stopTimer(); recordTime(2); G.currentQ++; nextQ_r2(); };
+    opts.appendChild(b);
+  });
+  startTimer(DATA.r2.time,'r2-arc','r2-timer','r2-pulse',()=>{ recordTime(2); G.currentQ++; nextQ_r2(); });
+}
+
+/* ════════════════════════════════
+   RONDA 3
+════════════════════════════════ */
+function nextQ_r3() {
+  const qs = DATA.r3;
+  if (G.currentQ >= qs.length) { afterRound(3); return; }
+  const total = qs.length;
+  document.getElementById('r3-counter').textContent = `${G.currentQ+1}/${total}`;
+  document.getElementById('r3-progress').style.width = `${(G.currentQ/total)*100}%`;
+  document.getElementById('r3-question').textContent = qs[G.currentQ];
+  G.questionStart = Date.now();
+}
+
+function answerSemaforo(color) {
+  recordTime(3);
+  G.r3[color]++;
+  G.currentQ++;
+  const qEl = document.getElementById('r3-question');
+  qEl.classList.add('flash');
+  setTimeout(()=>{ qEl.classList.remove('flash'); nextQ_r3(); }, 300);
+}
+
+/* ════════════════════════════════
+   RONDA 4
+════════════════════════════════ */
+function nextQ_r4() {
+  const qs = DATA.r4;
+  if (G.currentQ >= qs.length) { afterRound(4); return; }
+  const total = qs.length, q = qs[G.currentQ];
+  document.getElementById('r4-counter').textContent = `${G.currentQ+1}/${total}`;
+  document.getElementById('r4-progress').style.width = `${(G.currentQ/total)*100}%`;
+  const wrap = document.getElementById('r4-duelo-wrap');
+  wrap.innerHTML='';
+  const grid = document.createElement('div'); grid.className='duelo-wrap';
+  q.forEach((opt,i)=>{
+    const b = document.createElement('button'); b.className='btn-duelo'; b.textContent=opt;
+    b.onclick=()=>{
+      recordTime(4); G.currentQ++;
+      wrap.style.transition='opacity .22s,transform .22s';
+      wrap.style.opacity='0'; wrap.style.transform='scale(.95)';
+      setTimeout(()=>{ wrap.style.opacity='1'; wrap.style.transform=''; nextQ_r4(); },240);
+    };
+    grid.appendChild(b);
+  });
+  const vs=document.createElement('div'); vs.className='vs-label'; vs.textContent='VS';
+  grid.insertBefore(vs, grid.children[1]);
+  wrap.appendChild(grid); wrap.style.opacity='1'; wrap.style.transform='';
+  G.questionStart = Date.now();
+}
+
+/* ════════════════════════════════
+   STATS HELPERS
+════════════════════════════════ */
+function calcStats(roundKey) {
+  const d = G[roundKey];
+  const times = d.times;
+  if (!times.length) return { total:0, avg:'–', fast:0, slow:0 };
+  const avg = (times.reduce((a,b)=>a+b,0)/times.length).toFixed(1);
+  const fast = times.filter(t=>t<2).length;
+  const slow = times.filter(t=>t>3).length;
+  return { total: d.decisions, avg, fast, slow };
+}
+
+function statsHTML(s) {
+  return `
+    <div class="stat-box"><div class="stat-num">${s.total}</div><div class="stat-label">Decisiones</div></div>
+    <div class="stat-box"><div class="stat-num">${s.avg}s</div><div class="stat-label">Tiempo promedio</div></div>
+    <div class="stat-box"><div class="stat-num">${s.fast}</div><div class="stat-label">Antes de 2 seg</div></div>
+    <div class="stat-box"><div class="stat-num">${s.slow}</div><div class="stat-label">Más de 3 seg</div></div>`;
+}
+
+/* ════════════════════════════════
+   SINGLE ROUND RESULTS
+════════════════════════════════ */
+function buildSingleResult(n) {
+  if (n === 3) {
+    document.getElementById('sem-green-res').textContent  = G.r3.green;
+    document.getElementById('sem-yellow-res').textContent = G.r3.yellow;
+    document.getElementById('sem-red-res').textContent    = G.r3.red;
+  } else {
+    const s = calcStats('r'+n);
+    document.getElementById('res'+n+'-stats').innerHTML = statsHTML(s);
+  }
+  // buttons
+  const btns = document.getElementById('res'+n+'-btns');
+  btns.innerHTML = '';
+  // play again same round
+  const again = document.createElement('button');
+  again.className='btn btn-primary'; again.textContent='🔄 Jugar esta ronda de nuevo';
+  again.onclick = ()=>playSingle(n);
+  btns.appendChild(again);
+  // menu
+  const menu = document.createElement('button');
+  menu.className='btn btn-ghost'; menu.textContent='← Volver al menú';
+  menu.onclick = resetGame;
+  btns.appendChild(menu);
+}
+
+/* ════════════════════════════════
+   FULL FINAL REPORT
+════════════════════════════════ */
+function buildFinalReport() {
+  // general
+  const allTimes = [...G.r1.times,...G.r2.times,...G.r3.times,...G.r4.times];
+  const total = G.r1.decisions+G.r2.decisions+G.r3.decisions+G.r4.decisions;
+  const avg = allTimes.length ? (allTimes.reduce((a,b)=>a+b,0)/allTimes.length).toFixed(1) : '–';
+  const fast = allTimes.filter(t=>t<2).length;
+  const slow = allTimes.filter(t=>t>3).length;
+  document.getElementById('final-stats-general').innerHTML=`
+    <div class="stat-box"><div class="stat-num">${total}</div><div class="stat-label">Decisiones totales</div></div>
+    <div class="stat-box"><div class="stat-num">${avg}s</div><div class="stat-label">Tiempo promedio</div></div>
+    <div class="stat-box"><div class="stat-num">${fast}</div><div class="stat-label">Antes de 2 seg</div></div>
+    <div class="stat-box"><div class="stat-num">${slow}</div><div class="stat-label">Más de 3 seg</div></div>`;
+  document.getElementById('final-sem').innerHTML=`
+    <div class="sem-res green"><div class="emoji">🟢</div><div class="count">${G.r3.green}</div><div class="name">Lo haría</div></div>
+    <div class="sem-res yellow"><div class="emoji">🟡</div><div class="count">${G.r3.yellow}</div><div class="name">Lo pensaría</div></div>
+    <div class="sem-res red"><div class="emoji">🔴</div><div class="count">${G.r3.red}</div><div class="name">No lo haría</div></div>`;
+  // per-round tabs
+  document.getElementById('final-stats-r1').innerHTML=statsHTML(calcStats('r1'));
+  document.getElementById('final-stats-r2').innerHTML=statsHTML(calcStats('r2'));
+  document.getElementById('final-sem-r3').innerHTML=`
+    <div class="sem-res green"><div class="emoji">🟢</div><div class="count">${G.r3.green}</div><div class="name">Lo haría</div></div>
+    <div class="sem-res yellow"><div class="emoji">🟡</div><div class="count">${G.r3.yellow}</div><div class="name">Lo pensaría</div></div>
+    <div class="sem-res red"><div class="emoji">🔴</div><div class="count">${G.r3.red}</div><div class="name">No lo haría</div></div>`;
+  document.getElementById('final-stats-r4').innerHTML=statsHTML(calcStats('r4'));
+  showScreen('final');
+}
+
+function switchTab(name) {
+  ['general','r1','r2','r3','r4'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display = t===name ? 'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach((btn,i)=>{
+    const names=['general','r1','r2','r3','r4'];
+    btn.classList.toggle('active', names[i]===name);
+  });
+}
+</script>
+</body>
+</html>
