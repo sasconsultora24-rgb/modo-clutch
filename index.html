@@ -3,779 +3,638 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏀 MODO CLUTCH</title>
+<title>🏀 MODO CLUTCH — PMT</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
-:root {
-  --orange:#FF6B00;--orange-light:#FF8C38;--black:#0A0A0A;--black-2:#111;
-  --black-3:#1A1A1A;--black-4:#242424;--white:#F5F5F0;--white-dim:rgba(245,245,240,0.65);
-  --blue:#1E6FD9;--green:#2ECC71;--yellow:#F1C40F;--red:#E74C3C;
+:root{
+  --orange:#FF6B00;--orange-light:#FF8C38;--orange-glow:rgba(255,107,0,.35);
+  --black:#080808;--black-3:#1A1A1A;--black-4:#222;--black-5:#2A2A2A;
+  --white:#F0EDE8;--white-dim:rgba(240,237,232,.62);--white-faint:rgba(240,237,232,.18);
+  --green:#2ECC71;--yellow:#F1C40F;--red:#E74C3C;--blue:#3498DB;--purple:#9B59B6;
   --fd:'Black Ops One',cursive;--fc:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;min-height:100%;background:var(--black);color:var(--white);font-family:var(--fb);overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,107,0,.12) 0%,transparent 60%),
-  radial-gradient(ellipse 60% 40% at 80% 100%,rgba(30,111,217,.08) 0%,transparent 60%),
-  repeating-linear-gradient(0deg,transparent,transparent 48px,rgba(255,255,255,.015) 48px,rgba(255,255,255,.015) 49px),
-  repeating-linear-gradient(90deg,transparent,transparent 48px,rgba(255,255,255,.015) 48px,rgba(255,255,255,.015) 49px);
-  pointer-events:none;z-index:0}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 55% at 50% -5%,rgba(255,107,0,.1) 0%,transparent 60%),
+  repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,.015) 59px,rgba(255,255,255,.015) 60px),
+  repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,.015) 59px,rgba(255,255,255,.015) 60px)}
 #app{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.screen{display:none;width:100%;max-width:720px;animation:fsIn .45s cubic-bezier(.22,.68,0,1.2) both}
+.screen{display:none;width:100%;max-width:740px;animation:fsIn .4s cubic-bezier(.22,.68,0,1.15) both}
 .screen.active{display:block}
-@keyframes fsIn{from{opacity:0;transform:translateY(32px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes fsIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
 
-/* ── SHARED ── */
-.card{background:var(--black-3);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:28px 32px}
-.divider{width:60px;height:3px;background:linear-gradient(90deg,var(--orange),transparent);border-radius:99px;margin:14px 0}
+/* SHARED */
+.divider{width:44px;height:3px;background:linear-gradient(90deg,var(--orange),transparent);border-radius:99px;margin:14px 0}
 .divider.center{margin-left:auto;margin-right:auto}
-.progress-wrap{margin-bottom:18px}
-.progress-label{display:flex;justify-content:space-between;font-family:var(--fc);font-size:.78rem;letter-spacing:.08em;color:var(--white-dim);margin-bottom:6px}
-.progress-bar{height:4px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange-light));border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
-.q-round-badge{font-family:var(--fd);font-size:.8rem;color:var(--orange);background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.3);padding:4px 11px;border-radius:6px;white-space:nowrap}
-.question-text{font-family:var(--fc);font-weight:700;font-size:clamp(1.25rem,4vw,1.65rem);line-height:1.25;margin:18px 0 20px;color:var(--white)}
+.eyebrow{font-family:var(--fc);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--orange)}
+.prog-wrap{margin-bottom:16px}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.prog-bar{height:3px;background:var(--white-faint);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange-light));border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.timer-wrap{display:flex;align-items:center;justify-content:center;margin:10px 0}
+.timer-box{font-family:var(--fd);font-size:1.8rem;color:var(--orange);border:2px solid var(--orange);padding:3px 16px;border-radius:4px;min-width:72px;text-align:center;transition:color .25s,border-color .25s}
+.timer-box.warn{color:var(--yellow);border-color:var(--yellow)}
+.timer-box.danger{color:var(--red);border-color:var(--red);animation:pulse .5s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;font-family:var(--fc);font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .2s;user-select:none}
+.btn:active{transform:scale(.95)!important}
+.btn-primary{background:var(--orange);color:#000;font-size:1.05rem;padding:15px 34px;box-shadow:0 4px 24px var(--orange-glow);letter-spacing:.06em;text-transform:uppercase}
+.btn-primary:hover{box-shadow:0 6px 32px rgba(255,107,0,.55);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--white-dim);border:1px solid var(--white-faint);font-size:.85rem;padding:10px 20px;letter-spacing:.04em;text-transform:uppercase}
+.btn-ghost:hover{border-color:rgba(240,237,232,.35);color:var(--white)}
+.btn-answer{width:100%;background:var(--black-4);color:var(--white);border:1px solid rgba(240,237,232,.08);border-radius:10px;padding:15px 18px;font-size:.94rem;text-align:left;line-height:1.4;cursor:pointer;font-family:var(--fb);transition:background .2s,border-color .2s,transform .15s;margin-bottom:8px}
+.btn-answer:hover{background:rgba(255,107,0,.1);border-color:rgba(255,107,0,.4);transform:translateX(4px)}
+.q-context{font-family:var(--fb);font-size:.83rem;color:var(--white-dim);background:rgba(255,107,0,.07);border-left:3px solid var(--orange);padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:12px;line-height:1.5}
+.q-text{font-family:var(--fc);font-weight:700;font-size:clamp(1.15rem,3.4vw,1.55rem);line-height:1.28;margin:12px 0 16px;color:var(--white)}
 
-/* ── TIMER ── */
-.timer-wrap{display:flex;align-items:center;justify-content:center;margin:14px 0}
-.timer-ring{position:relative;width:80px;height:80px}
-.timer-svg{transform:rotate(-90deg)}
-.timer-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:6}
-.timer-arc{fill:none;stroke:var(--orange);stroke-width:6;stroke-linecap:round;stroke-dasharray:201;stroke-dashoffset:0;transition:stroke .3s}
-.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.6rem}
-.timer-arc.warn{stroke:var(--yellow)}.timer-arc.danger{stroke:var(--red)}
-.pulse-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--orange);animation:pulsate 1s ease-out infinite;opacity:0;display:none}
-@keyframes pulsate{0%{transform:scale(.9);opacity:.7}100%{transform:scale(1.4);opacity:0}}
+/* DUEL */
+.duel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.btn-duel{display:flex;align-items:center;justify-content:center;padding:24px 12px;border:1.5px solid rgba(240,237,232,.1);border-radius:12px;background:var(--black-4);color:var(--white);font-family:var(--fc);font-weight:900;font-size:.98rem;text-align:center;line-height:1.2;cursor:pointer;transition:all .2s}
+.btn-duel:hover{background:rgba(255,107,0,.14);border-color:var(--orange);transform:scale(1.03)}
+.vs-badge{display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.2rem;color:var(--orange);grid-column:1/-1;padding:4px 0}
 
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border:none;border-radius:10px;font-family:var(--fc);font-weight:700;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;user-select:none}
-.btn:active{transform:scale(.96)}
-.btn-primary{background:var(--orange);color:#000;box-shadow:0 4px 24px rgba(255,107,0,.35);font-size:1.15rem;padding:17px 38px}
-.btn-primary:hover{box-shadow:0 6px 32px rgba(255,107,0,.5);transform:translateY(-2px)}
-.btn-ghost{background:transparent;color:var(--white-dim);border:1px solid rgba(255,255,255,.15);font-size:.9rem;padding:11px 22px}
-.btn-ghost:hover{border-color:rgba(255,255,255,.35);color:var(--white)}
-.btn-answer{width:100%;background:var(--black-4);color:var(--white);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:17px 20px;font-size:.97rem;text-transform:none;letter-spacing:.01em;text-align:left;margin-bottom:10px;line-height:1.3;transition:background .2s,border-color .2s,transform .15s;cursor:pointer;font-family:var(--fb)}
-.btn-answer:hover{background:rgba(255,107,0,.12);border-color:var(--orange);transform:translateX(4px)}
+/* ANCLA BUILDER */
+.ancla-step{background:var(--black-3);border:1px solid rgba(240,237,232,.08);border-radius:14px;padding:20px;margin-bottom:0}
+.ancla-step-title{font-family:var(--fd);font-size:1rem;color:var(--orange);margin-bottom:4px;letter-spacing:.04em}
+.ancla-step-desc{font-size:.84rem;color:var(--white-dim);margin-bottom:16px;line-height:1.5}
+.ancla-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ancla-opt{padding:14px 12px;border:1.5px solid rgba(240,237,232,.1);border-radius:10px;background:var(--black-4);cursor:pointer;text-align:center;transition:all .2s}
+.ancla-opt:hover{border-color:var(--orange);background:rgba(255,107,0,.08);transform:translateY(-2px)}
+.ancla-opt.selected{border-color:var(--orange);background:rgba(255,107,0,.15)}
+.ancla-opt .ao-emoji{font-size:1.8rem;display:block;margin-bottom:5px}
+.ancla-opt .ao-text{font-family:var(--fc);font-weight:700;font-size:.88rem;color:var(--white)}
+.ancla-opt .ao-sub{font-size:.72rem;color:var(--white-dim);margin-top:2px}
+.ancla-progress{display:flex;gap:6px;margin-bottom:18px;justify-content:center}
+.ancla-dot{width:8px;height:8px;border-radius:50%;background:var(--white-faint);transition:background .3s}
+.ancla-dot.done{background:var(--orange)}
+.ancla-dot.active{background:var(--orange-light);transform:scale(1.3)}
+.ancla-built{background:rgba(255,107,0,.06);border:1px solid rgba(255,107,0,.2);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.ancla-built-label{font-family:var(--fc);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);min-width:80px}
+.ancla-built-val{font-size:.9rem;color:var(--white)}
 
-/* ── SEMÁFORO ── */
-.semaforo-wrap{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:20px}
-.btn-sem{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px 10px;border:none;border-radius:14px;font-family:var(--fc);font-weight:900;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:transform .15s,box-shadow .2s}
-.btn-sem span{font-size:1.8rem}
-.btn-sem:hover{transform:translateY(-3px)}
-.btn-sem:active{transform:scale(.95)}
-.btn-sem-green{background:rgba(46,204,113,.15);color:var(--green);border:2px solid var(--green)}
-.btn-sem-yellow{background:rgba(241,196,15,.12);color:var(--yellow);border:2px solid var(--yellow)}
-.btn-sem-red{background:rgba(231,76,60,.13);color:var(--red);border:2px solid var(--red)}
-.btn-sem-green:hover{box-shadow:0 0 20px rgba(46,204,113,.3)}
-.btn-sem-yellow:hover{box-shadow:0 0 20px rgba(241,196,15,.3)}
-.btn-sem-red:hover{box-shadow:0 0 20px rgba(231,76,60,.3)}
-
-/* ── DUELO ── */
-.duelo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
-.btn-duelo{display:flex;align-items:center;justify-content:center;padding:28px 16px;border:2px solid rgba(255,255,255,.12);border-radius:14px;background:var(--black-4);color:var(--white);font-family:var(--fc);font-weight:900;font-size:1.05rem;letter-spacing:.03em;text-transform:uppercase;text-align:center;line-height:1.25;cursor:pointer;transition:background .2s,border-color .2s,transform .15s,box-shadow .2s}
-.btn-duelo:hover{background:rgba(255,107,0,.18);border-color:var(--orange);transform:scale(1.03);box-shadow:0 4px 20px rgba(255,107,0,.25)}
-.vs-label{display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.4rem;color:var(--orange);padding:8px 0;grid-column:1/-1}
-
-/* ── SPLASH ── */
+/* SPLASH */
 #screen-splash{text-align:center}
-.splash-icon{font-size:clamp(4rem,12vw,7rem);display:block;margin-bottom:12px;animation:bounce 2s ease-in-out infinite}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.splash-title{font-family:var(--fd);font-size:clamp(2.8rem,8vw,5rem);color:var(--orange);text-shadow:0 0 40px rgba(255,107,0,.4);line-height:1;margin-bottom:8px}
-.splash-sub{font-family:var(--fc);font-size:clamp(1rem,3vw,1.2rem);color:var(--white-dim);letter-spacing:.05em;margin-bottom:32px;line-height:1.5}
+.splash-icon{font-size:clamp(3.2rem,10vw,5.5rem);display:block;margin-bottom:8px;animation:bounce 2.2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.splash-title{font-family:var(--fd);font-size:clamp(2.6rem,8vw,4.5rem);color:var(--white);line-height:1}
+.splash-sub{font-family:var(--fc);font-size:clamp(.88rem,2.3vw,1.05rem);color:var(--white-dim);letter-spacing:.04em;margin:10px 0 6px;line-height:1.55}
+.splash-desc{font-size:.86rem;color:var(--white-dim);max-width:460px;margin:0 auto 24px;line-height:1.6;text-align:center}
+.menu-all{width:100%;background:var(--orange);border:none;border-radius:10px;padding:17px 20px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;transition:box-shadow .2s,transform .15s}
+.menu-all:hover{box-shadow:0 8px 32px var(--orange-glow);transform:translateY(-2px)}
+.ma-name{font-family:var(--fd);font-size:1.05rem;color:#000;letter-spacing:.04em}
+.ma-desc{font-family:var(--fc);font-size:.7rem;color:rgba(0,0,0,.55);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.sec-label{font-family:var(--fc);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--white-dim);margin:5px 0 10px;text-align:center}
+.module-list{display:flex;flex-direction:column;gap:7px}
+.module{display:flex;align-items:flex-start;gap:12px;background:var(--black-3);border:1px solid rgba(240,237,232,.07);border-radius:10px;padding:13px 15px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s}
+.module:hover{border-color:var(--orange);background:var(--black-4);transform:translateX(4px)}
+.mod-icon{font-size:1.4rem;width:32px;flex-shrink:0;text-align:center;margin-top:2px}
+.mod-body{flex:1}
+.mod-name{font-family:var(--fc);font-weight:700;font-size:.93rem;color:var(--white)}
+.mod-skill{font-family:var(--fc);font-size:.68rem;color:var(--orange);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.mod-desc{font-size:.76rem;color:var(--white-dim);margin-top:3px;line-height:1.4}
+.mod-tag{font-family:var(--fc);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.tag-t{background:rgba(241,196,15,.12);color:var(--yellow);border:1px solid rgba(241,196,15,.3)}
+.tag-b{background:rgba(62,217,176,.1);color:#3ED9B0;border:1px solid rgba(62,217,176,.3)}
 
-/* ── MENU SELECTOR ── */
-.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.menu-card{background:var(--black-3);border:2px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 16px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;text-align:left;position:relative;overflow:hidden}
-.menu-card:hover{border-color:var(--orange);background:rgba(255,107,0,.07);transform:translateY(-2px)}
-.menu-card:active{transform:scale(.97)}
-.menu-card .mc-num{font-family:var(--fd);font-size:1.8rem;color:var(--orange);line-height:1}
-.menu-card .mc-name{font-family:var(--fc);font-weight:700;font-size:.95rem;letter-spacing:.05em;text-transform:uppercase;color:var(--white);margin-top:4px}
-.menu-card .mc-desc{font-size:.75rem;color:var(--white-dim);margin-top:4px}
-.menu-card .mc-time{position:absolute;top:12px;right:12px;font-family:var(--fc);font-size:.7rem;background:rgba(255,107,0,.15);color:var(--orange);padding:3px 8px;border-radius:99px;border:1px solid rgba(255,107,0,.3)}
-.menu-all{background:var(--orange);border:none;border-radius:14px;padding:18px 24px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:box-shadow .2s,transform .15s;width:100%;margin-bottom:12px}
-.menu-all:hover{box-shadow:0 6px 28px rgba(255,107,0,.45);transform:translateY(-2px)}
-.menu-all .ma-left{text-align:left}
-.menu-all .ma-icon{font-size:1.8rem}
-.menu-all .ma-name{font-family:var(--fd);font-size:1.2rem;color:#000;line-height:1}
-.menu-all .ma-desc{font-family:var(--fc);font-size:.78rem;color:rgba(0,0,0,.65);letter-spacing:.05em;text-transform:uppercase;margin-top:3px}
-.section-label{font-family:var(--fc);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--white-dim);margin-bottom:12px;margin-top:8px}
+/* RT */
+.rt{text-align:center}
+.rt-icon{font-size:2.2rem;display:block;margin-bottom:6px}
+.rt-num{font-family:var(--fd);font-size:clamp(3rem,11vw,5.5rem);color:var(--orange);line-height:1;text-shadow:0 0 60px var(--orange-glow)}
+.rt-title{font-family:var(--fd);font-size:clamp(1.3rem,4vw,2rem);color:var(--white);margin-top:4px}
+.rt-skill{font-family:var(--fc);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-top:8px;background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.2);display:inline-block;padding:4px 12px;border-radius:99px}
+.rt-desc{font-size:.88rem;color:var(--white-dim);margin:12px auto 22px;max-width:400px;line-height:1.6}
 
-/* ── ROUND TRANSITION ── */
-.round-transition{text-align:center}
-.rt-number{font-family:var(--fd);font-size:clamp(4rem,14vw,7rem);color:var(--orange);line-height:1;text-shadow:0 0 60px rgba(255,107,0,.3)}
-.rt-title{font-family:var(--fd);font-size:clamp(1.4rem,5vw,2.3rem);color:var(--white);margin-top:4px}
-.rt-subtitle{font-family:var(--fc);font-size:1rem;letter-spacing:.1em;color:var(--white-dim);text-transform:uppercase;margin-top:10px;margin-bottom:28px}
+/* COUNTDOWN */
+#cdOverlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(8,8,8,.9);align-items:center;justify-content:center;flex-direction:column;gap:10px}
+#cdOverlay.on{display:flex}
+.cd-num{font-family:var(--fd);font-size:clamp(5rem,16vw,8rem);color:var(--orange);animation:popIn .5s cubic-bezier(.17,.67,.4,1.4)}
+@keyframes popIn{from{transform:scale(.35);opacity:0}to{transform:scale(1);opacity:1}}
+.cd-sub{font-family:var(--fc);font-size:.92rem;letter-spacing:.16em;text-transform:uppercase;color:var(--white-dim)}
 
-/* ── COUNTDOWN ── */
-#countdownOverlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.88);align-items:center;justify-content:center;flex-direction:column;gap:12px}
-#countdownOverlay.visible{display:flex}
-.countdown-num{font-family:var(--fd);font-size:clamp(5rem,20vw,10rem);color:var(--orange);animation:popIn .6s cubic-bezier(.17,.67,.4,1.4)}
-@keyframes popIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
-.countdown-sub{font-family:var(--fc);font-size:1.1rem;letter-spacing:.15em;text-transform:uppercase;color:var(--white-dim)}
+/* REPORTS */
+.res-icon{font-size:2.4rem;display:block;text-align:center;margin-bottom:5px}
+.res-title{font-family:var(--fd);font-size:clamp(1.4rem,4.5vw,2.1rem);color:var(--orange);text-align:center;margin-bottom:4px}
+.res-skill-badge{display:inline-block;font-family:var(--fc);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:99px;margin:0 auto 14px;background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.22);color:var(--orange)}
+.perfil-card{background:var(--black-3);border:1px solid rgba(240,237,232,.07);border-radius:12px;padding:18px;margin:14px 0}
+.perfil-title{font-family:var(--fc);font-weight:900;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--white-dim);margin-bottom:12px}
+.perfil-bar-wrap{margin-bottom:10px}
+.perfil-bar-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.perfil-bar-name{font-family:var(--fc);font-size:.83rem;font-weight:700;color:var(--white)}
+.perfil-bar-val{font-family:var(--fd);font-size:.85rem;color:var(--orange)}
+.perfil-bar{height:5px;background:rgba(240,237,232,.07);border-radius:99px;overflow:hidden}
+.perfil-bar-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.insight-card{background:var(--black-4);border:1px solid rgba(240,237,232,.06);border-radius:10px;padding:14px 12px}
+.insight-label{font-family:var(--fc);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.insight-label.f{color:var(--green)}.insight-label.b{color:var(--red)}.insight-label.a{color:var(--yellow)}
+.insight-text{font-size:.85rem;line-height:1.5;color:var(--white)}
+.next-step{background:rgba(255,107,0,.07);border:1px solid rgba(255,107,0,.18);border-radius:10px;padding:16px;margin:12px 0}
+.next-step-title{font-family:var(--fc);font-weight:900;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:7px}
+.next-step-text{font-size:.92rem;line-height:1.6;color:var(--white)}
 
-/* ── RESULT SCREENS ── */
-.result-title{font-family:var(--fd);font-size:clamp(1.6rem,5vw,2.5rem);color:var(--orange);text-align:center;margin-bottom:6px}
-.result-icon{font-size:2.8rem;text-align:center;display:block;margin-bottom:8px}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
-.stat-box{background:var(--black-4);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px 14px;text-align:center}
-.stat-num{font-family:var(--fd);font-size:2.1rem;color:var(--orange);line-height:1}
-.stat-label{font-family:var(--fc);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--white-dim);margin-top:4px}
-.semaforo-result{display:flex;gap:10px;justify-content:center;margin:16px 0}
-.sem-res{flex:1;background:var(--black-4);border-radius:12px;padding:14px 8px;text-align:center;border:2px solid transparent}
-.sem-res.green{border-color:var(--green)}.sem-res.yellow{border-color:var(--yellow)}.sem-res.red{border-color:var(--red)}
-.sem-res .emoji{font-size:1.5rem}.sem-res .count{font-family:var(--fd);font-size:1.8rem;color:var(--white)}.sem-res .name{font-family:var(--fc);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--white-dim)}
-.reflexion-title{font-family:var(--fc);font-weight:900;font-size:.88rem;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;margin-top:20px}
-.reflexion-q{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:var(--black-4);border-radius:10px;margin-bottom:7px;border-left:3px solid var(--orange)}
-.reflexion-q .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);margin-top:6px;flex-shrink:0}
-.reflexion-q p{font-size:.9rem;color:var(--white-dim);line-height:1.5}
-.round-result-header{background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.25);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-family:var(--fc);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--orange)}
-.btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+/* ANCLA RESULT CARD */
+.ancla-result-card{background:var(--black-3);border:1px solid rgba(255,107,0,.25);border-radius:14px;padding:20px;margin:14px 0}
+.ancla-result-title{font-family:var(--fd);font-size:1.1rem;color:var(--orange);margin-bottom:4px}
+.ancla-result-sub{font-size:.82rem;color:var(--white-dim);margin-bottom:16px;line-height:1.5}
+.ancla-piece{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--black-4);border-radius:8px;margin-bottom:7px}
+.ancla-piece-icon{font-size:1.4rem;flex-shrink:0}
+.ancla-piece-body{flex:1}
+.ancla-piece-label{font-family:var(--fc);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--orange)}
+.ancla-piece-val{font-size:.9rem;color:var(--white);margin-top:1px}
 
-/* ── FINAL TABS ── */
-.tabs{display:flex;gap:6px;margin-bottom:18px;background:var(--black-4);padding:5px;border-radius:10px}
-.tab{flex:1;padding:9px 10px;border:none;border-radius:7px;background:transparent;color:var(--white-dim);font-family:var(--fc);font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s}
-.tab.active{background:var(--orange);color:#000}
-
-/* ── FLASH ── */
-@keyframes flashPulse{0%{opacity:1}50%{opacity:.3}100%{opacity:1}}
-.flash{animation:flashPulse .3s ease}
-
-@media(max-width:480px){
-  .duelo-wrap{grid-template-columns:1fr}
-  .menu-grid{grid-template-columns:1fr}
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .card{padding:18px 16px}
-  .semaforo-wrap{gap:8px}
-  .btn-sem span{font-size:1.4rem}
-  .btn-row{flex-direction:column;align-items:center}
-}
+.rfx-title{font-family:var(--fc);font-weight:900;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--white-dim);margin:18px 0 9px}
+.rfx-q{display:flex;gap:9px;align-items:flex-start;padding:10px 12px;background:var(--black-4);border-radius:7px;margin-bottom:6px;border-left:2px solid var(--orange)}
+.rfx-q .d{width:5px;height:5px;border-radius:50%;background:var(--orange);margin-top:7px;flex-shrink:0}
+.rfx-q p{font-family:var(--fb);font-size:.85rem;color:var(--white-dim);line-height:1.5}
+.btn-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+@keyframes flash{0%{opacity:1}40%{opacity:.25}100%{opacity:1}}
+.flash{animation:flash .26s ease}
+@media(max-width:480px){.duel-grid,.ancla-options,.insight-grid{grid-template-columns:1fr}.btn-row{flex-direction:column;align-items:center}}
 </style>
 </head>
 <body>
-
-<div id="countdownOverlay">
-  <div class="countdown-num" id="countdownNum">3</div>
-  <div class="countdown-sub">Preparate</div>
-</div>
-
+<div id="cdOverlay"><div class="cd-num" id="cdNum">3</div><div class="cd-sub">Preparate</div></div>
 <div id="app">
 
-<!-- ══════════════════ SPLASH / MENÚ ══════════════════ -->
+<!-- SPLASH -->
 <div id="screen-splash" class="screen active">
   <span class="splash-icon">🏀</span>
   <h1 class="splash-title">MODO CLUTCH</h1>
   <div class="divider center"></div>
-  <p class="splash-sub">¿Qué hacés cuando<br>el partido depende de vos?</p>
-
+  <p class="splash-sub">Entrenamiento de habilidades mentales</p>
+  <p class="splash-desc">Cuatro ejercicios distintos. Cada uno entrena algo diferente. Al terminar, sabés exactamente qué tenés que trabajar y con qué herramienta hacerlo.</p>
   <button class="menu-all" onclick="playAll()">
-    <div class="ma-left">
-      <div class="ma-name">JUGAR TODO JUNTO</div>
-      <div class="ma-desc">Las 4 rondas completas</div>
-    </div>
-    <div class="ma-icon">🔥</div>
+    <div style="text-align:left"><div class="ma-name">JUGAR TODO JUNTO</div><div class="ma-desc">Las 4 rondas · Perfil mental completo</div></div>
+    <div style="font-size:1.5rem">🔥</div>
   </button>
-
-  <div class="section-label">— O elegí una ronda —</div>
-
-  <div class="menu-grid">
-    <div class="menu-card" onclick="playSingle(1)">
-      <div class="mc-time">3 seg</div>
-      <div class="mc-num">01</div>
-      <div class="mc-name">Decisión Instantánea</div>
-      <div class="mc-desc">15 preguntas · respuesta rápida</div>
+  <div class="sec-label">— o elegí una ronda —</div>
+  <div class="module-list">
+    <div class="module" onclick="playSingle(1)">
+      <div class="mod-icon">⚡</div>
+      <div class="mod-body">
+        <div class="mod-name">Decisión Instantánea</div>
+        <div class="mod-skill">Toma de decisiones bajo presión</div>
+        <div class="mod-desc">15 situaciones reales de partido. 4 segundos. ¿Decidís desde la confianza o desde el miedo?</div>
+      </div>
+      <div class="mod-tag tag-t">4 seg</div>
     </div>
-    <div class="menu-card" onclick="playSingle(2)">
-      <div class="mc-time">5 seg</div>
-      <div class="mc-num">02</div>
-      <div class="mc-name">Bajo Presión</div>
-      <div class="mc-desc">15 situaciones · presión real</div>
+    <div class="module" onclick="playSingle(2)">
+      <div class="mod-icon">🔥</div>
+      <div class="mod-body">
+        <div class="mod-name">Bajo Presión</div>
+        <div class="mod-skill">Regulación emocional en situaciones límite</div>
+        <div class="mod-desc">15 situaciones con contexto real. ¿Cómo respondés cuando todo sale mal?</div>
+      </div>
+      <div class="mod-tag tag-t">5 seg</div>
     </div>
-    <div class="menu-card" onclick="playSingle(3)">
-      <div class="mc-num">03</div>
-      <div class="mc-name">Semáforo</div>
-      <div class="mc-desc">20 situaciones · ¿lo harías?</div>
+    <div class="module" onclick="playSingle(3)">
+      <div class="mod-icon">⚓</div>
+      <div class="mod-body">
+        <div class="mod-name">Ancla Mental</div>
+        <div class="mod-skill">Construcción de herramientas de regulación</div>
+        <div class="mod-desc">No elegís cómo reaccionarías — construís tu propia herramienta mental. Te la llevás.</div>
+      </div>
+      <div class="mod-tag tag-b">Constructor</div>
     </div>
-    <div class="menu-card" onclick="playSingle(4)">
-      <div class="mc-num">04</div>
-      <div class="mc-name">Elegí Ya</div>
-      <div class="mc-desc">10 duelos · sin tiempo</div>
+    <div class="module" onclick="playSingle(4)">
+      <div class="mod-icon">⚔️</div>
+      <div class="mod-body">
+        <div class="mod-name">Elegí Ya</div>
+        <div class="mod-skill">Valores y prioridades reales bajo presión</div>
+        <div class="mod-desc">10 duelos. 3 segundos. Lo primero que te salga — eso es lo que realmente priorizás.</div>
+      </div>
+      <div class="mod-tag tag-t">3 seg</div>
     </div>
-  </div>
-</div>
-
-<!-- ══════════════════ ROUND TRANSITIONS ══════════════════ -->
-<div id="screen-rt1" class="screen">
-  <div class="round-transition">
-    <div class="rt-number">01</div>
-    <div class="rt-title">DECISIÓN INSTANTÁNEA</div>
-    <div class="rt-subtitle">Tenés 3 segundos para decidir</div>
-    <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(1)">¡ARRANCAMOS!</button></div>
-  </div>
-</div>
-<div id="screen-rt2" class="screen">
-  <div class="round-transition">
-    <div class="rt-number">02</div>
-    <div class="rt-title">BAJO PRESIÓN</div>
-    <div class="rt-subtitle">Situaciones reales · 5 segundos</div>
-    <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(2)">¡ARRANCAMOS!</button></div>
-  </div>
-</div>
-<div id="screen-rt3" class="screen">
-  <div class="round-transition">
-    <div class="rt-number">03</div>
-    <div class="rt-title">SEMÁFORO DEL DEPORTISTA</div>
-    <div class="rt-subtitle">¿Lo harías o no?</div>
-    <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(3)">¡ARRANCAMOS!</button></div>
-  </div>
-</div>
-<div id="screen-rt4" class="screen">
-  <div class="round-transition">
-    <div class="rt-number">04</div>
-    <div class="rt-title">ELEGÍ YA</div>
-    <div class="rt-subtitle">Sin tiempo para pensar</div>
-    <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(4)">¡ARRANCAMOS!</button></div>
   </div>
 </div>
 
-<!-- ══════════════════ RONDA 1 ══════════════════ -->
+<!-- TRANSITIONS -->
+<div id="screen-rt1" class="screen"><div class="rt">
+  <span class="rt-icon">⚡</span><div class="rt-num">01</div>
+  <div class="rt-title">DECISIÓN INSTANTÁNEA</div>
+  <div class="rt-skill">Toma de decisiones bajo presión</div>
+  <p class="rt-desc">15 situaciones reales. 4 segundos cada una. No hay respuestas correctas — hay la tuya. Elegí lo que harías de verdad, no lo que creés que está bien.</p>
+  <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(1)">ARRANCAR</button></div>
+</div></div>
+
+<div id="screen-rt2" class="screen"><div class="rt">
+  <span class="rt-icon">🔥</span><div class="rt-num">02</div>
+  <div class="rt-title">BAJO PRESIÓN</div>
+  <div class="rt-skill">Regulación emocional en situaciones límite</div>
+  <p class="rt-desc">Cómo respondés cuando algo sale mal dice más de vos que cuando todo sale bien. Cada situación tiene un contexto. 5 segundos. Elegí lo que harías de verdad.</p>
+  <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(2)">ARRANCAR</button></div>
+</div></div>
+
+<div id="screen-rt3" class="screen"><div class="rt">
+  <span class="rt-icon">⚓</span><div class="rt-num">03</div>
+  <div class="rt-title">ANCLA MENTAL</div>
+  <div class="rt-skill">Construcción de herramientas de regulación</div>
+  <p class="rt-desc">En este ejercicio no evaluamos — construís. Vas a armar tu propia herramienta mental eligiendo pieza por pieza. Al terminar, tenés algo concreto para usar en el próximo partido.</p>
+  <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(3)">CONSTRUIR MI ANCLA</button></div>
+</div></div>
+
+<div id="screen-rt4" class="screen"><div class="rt">
+  <span class="rt-icon">⚔️</span><div class="rt-num">04</div>
+  <div class="rt-title">ELEGÍ YA</div>
+  <div class="rt-skill">Valores y prioridades reales bajo presión</div>
+  <p class="rt-desc">3 segundos. Dos opciones. Lo primero que te salga. No lo que creés que debería ser — lo que realmente elegirías en ese momento.</p>
+  <div style="text-align:center"><button class="btn btn-primary" onclick="startRound(4)">ARRANCAR</button></div>
+</div></div>
+
+<!-- R1 — DECISION INSTANTANEA -->
 <div id="screen-r1" class="screen">
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span class="q-round-badge">R01 · DECISIÓN INSTANTÁNEA</span>
-      <span id="r1-counter">1/15</span>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="r1-progress" style="width:0%"></div></div>
-  </div>
-  <div class="timer-wrap">
-    <div class="timer-ring">
-      <div class="pulse-ring" id="r1-pulse"></div>
-      <svg class="timer-svg" width="80" height="80" viewBox="0 0 80 80">
-        <circle class="timer-track" cx="40" cy="40" r="32"/>
-        <circle class="timer-arc" id="r1-arc" cx="40" cy="40" r="32"/>
-      </svg>
-      <div class="timer-num" id="r1-timer">3</div>
-    </div>
-  </div>
-  <p id="r1-question" class="question-text"></p>
-  <div id="r1-options"></div>
+  <div class="prog-wrap"><div class="prog-top"><span class="eyebrow">⚡ Decisión Instantánea</span><span id="r1c" style="font-family:var(--fc);font-size:.76rem;color:var(--white-dim)">1/15</span></div><div class="prog-bar"><div class="prog-fill" id="r1p" style="width:0%"></div></div></div>
+  <div class="timer-wrap"><div class="timer-box" id="r1t">4</div></div>
+  <p class="q-text" id="r1q"></p>
+  <div id="r1o"></div>
 </div>
 
-<!-- ══════════════════ RONDA 2 ══════════════════ -->
+<!-- R2 — BAJO PRESION -->
 <div id="screen-r2" class="screen">
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span class="q-round-badge">R02 · BAJO PRESIÓN</span>
-      <span id="r2-counter">1/15</span>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="r2-progress" style="width:0%"></div></div>
-  </div>
-  <div class="timer-wrap">
-    <div class="timer-ring">
-      <div class="pulse-ring" id="r2-pulse"></div>
-      <svg class="timer-svg" width="80" height="80" viewBox="0 0 80 80">
-        <circle class="timer-track" cx="40" cy="40" r="32"/>
-        <circle class="timer-arc" id="r2-arc" cx="40" cy="40" r="32"/>
-      </svg>
-      <div class="timer-num" id="r2-timer">5</div>
-    </div>
-  </div>
-  <p id="r2-question" class="question-text"></p>
-  <div id="r2-options"></div>
+  <div class="prog-wrap"><div class="prog-top"><span class="eyebrow">🔥 Bajo Presión</span><span id="r2c" style="font-family:var(--fc);font-size:.76rem;color:var(--white-dim)">1/15</span></div><div class="prog-bar"><div class="prog-fill" id="r2p" style="width:0%"></div></div></div>
+  <div class="timer-wrap"><div class="timer-box" id="r2t">5</div></div>
+  <div class="q-context" id="r2ctx" style="display:none"></div>
+  <p class="q-text" id="r2q"></p>
+  <div id="r2o"></div>
 </div>
 
-<!-- ══════════════════ RONDA 3 ══════════════════ -->
+<!-- R3 — ANCLA MENTAL (Constructor) -->
 <div id="screen-r3" class="screen">
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span class="q-round-badge">R03 · SEMÁFORO</span>
-      <span id="r3-counter">1/20</span>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="r3-progress" style="width:0%"></div></div>
+  <div class="prog-wrap">
+    <div class="prog-top"><span class="eyebrow">⚓ Ancla Mental</span><span id="r3c" style="font-family:var(--fc);font-size:.76rem;color:var(--white-dim)">Paso 1 de 5</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="r3p" style="width:0%"></div></div>
   </div>
-  <p class="question-text" id="r3-question"></p>
-  <div class="semaforo-wrap">
-    <button class="btn-sem btn-sem-green"  onclick="answerSemaforo('green')"><span>🟢</span>LO HARÍA</button>
-    <button class="btn-sem btn-sem-yellow" onclick="answerSemaforo('yellow')"><span>🟡</span>LO PENSARÍA</button>
-    <button class="btn-sem btn-sem-red"    onclick="answerSemaforo('red')"><span>🔴</span>NO LO HARÍA</button>
-  </div>
+  <div class="ancla-progress" id="r3dots"></div>
+  <div id="r3built"></div>
+  <div id="r3step"></div>
 </div>
 
-<!-- ══════════════════ RONDA 4 ══════════════════ -->
+<!-- R4 — ELEGI YA -->
 <div id="screen-r4" class="screen">
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span class="q-round-badge">R04 · ELEGÍ YA</span>
-      <span id="r4-counter">1/10</span>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="r4-progress" style="width:0%"></div></div>
-  </div>
-  <div id="r4-duelo-wrap"></div>
+  <div class="prog-wrap"><div class="prog-top"><span class="eyebrow">⚔️ Elegí Ya</span><span id="r4c" style="font-family:var(--fc);font-size:.76rem;color:var(--white-dim)">1/10</span></div><div class="prog-bar"><div class="prog-fill" id="r4p" style="width:0%"></div></div></div>
+  <div class="timer-wrap"><div class="timer-box" id="r4t">3</div></div>
+  <div id="r4dw"></div>
 </div>
 
-<!-- ══════════════════ RESULTADOS POR RONDA ══════════════════ -->
+<!-- RESULTS R1 -->
 <div id="screen-res1" class="screen">
-  <span class="result-icon">⚡</span>
-  <div class="result-title">RONDA 01 COMPLETADA</div>
-  <div class="round-result-header">DECISIÓN INSTANTÁNEA · 15 preguntas · 3 segundos</div>
-  <div class="divider center"></div>
-  <div class="stats-grid" id="res1-stats"></div>
-  <div class="reflexion-title">🧠 Para reflexionar</div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿En qué preguntas dudaste más?</p></div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Cuándo fue más fácil decidir rápido?</p></div>
-  <div class="btn-row" id="res1-btns"></div>
+  <span class="res-icon">⚡</span><div class="res-title">TU PERFIL</div>
+  <div style="text-align:center"><div class="res-skill-badge">Decisión Instantánea</div></div>
+  <div id="rs1content"></div>
+  <div class="btn-row" id="rs1b"></div>
 </div>
 
+<!-- RESULTS R2 -->
 <div id="screen-res2" class="screen">
-  <span class="result-icon">🔥</span>
-  <div class="result-title">RONDA 02 COMPLETADA</div>
-  <div class="round-result-header">BAJO PRESIÓN · 15 situaciones · 5 segundos</div>
-  <div class="divider center"></div>
-  <div class="stats-grid" id="res2-stats"></div>
-  <div class="reflexion-title">🧠 Para reflexionar</div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Qué situación te generó más duda?</p></div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Hubo alguna respuesta que te sorprendió?</p></div>
-  <div class="btn-row" id="res2-btns"></div>
+  <span class="res-icon">🔥</span><div class="res-title">TU PERFIL</div>
+  <div style="text-align:center"><div class="res-skill-badge">Bajo Presión</div></div>
+  <div id="rs2content"></div>
+  <div class="btn-row" id="rs2b"></div>
 </div>
 
+<!-- RESULTS R3 — ANCLA -->
 <div id="screen-res3" class="screen">
-  <span class="result-icon">🚦</span>
-  <div class="result-title">RONDA 03 COMPLETADA</div>
-  <div class="round-result-header">SEMÁFORO DEL DEPORTISTA · 20 situaciones</div>
-  <div class="divider center"></div>
-  <div class="semaforo-result">
-    <div class="sem-res green"><div class="emoji">🟢</div><div class="count" id="sem-green-res">0</div><div class="name">Lo haría</div></div>
-    <div class="sem-res yellow"><div class="emoji">🟡</div><div class="count" id="sem-yellow-res">0</div><div class="name">Lo pensaría</div></div>
-    <div class="sem-res red"><div class="emoji">🔴</div><div class="count" id="sem-red-res">0</div><div class="name">No lo haría</div></div>
-  </div>
-  <div class="reflexion-title">🧠 Para reflexionar</div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Qué tendencias ves en tus respuestas?</p></div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Hay algo que te gustaría cambiar?</p></div>
-  <div class="btn-row" id="res3-btns"></div>
+  <span class="res-icon">⚓</span><div class="res-title">TU ANCLA MENTAL</div>
+  <div style="text-align:center"><div class="res-skill-badge">Lista para usar</div></div>
+  <div id="rs3content"></div>
+  <div class="btn-row" id="rs3b"></div>
 </div>
 
+<!-- RESULTS R4 -->
 <div id="screen-res4" class="screen">
-  <span class="result-icon">⚔️</span>
-  <div class="result-title">RONDA 04 COMPLETADA</div>
-  <div class="round-result-header">ELEGÍ YA · 10 duelos</div>
-  <div class="divider center"></div>
-  <div class="stats-grid" id="res4-stats"></div>
-  <div class="reflexion-title">🧠 Para reflexionar</div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Qué duelo fue el más difícil?</p></div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Qué dice de vos lo que elegiste?</p></div>
-  <div class="btn-row" id="res4-btns"></div>
+  <span class="res-icon">⚔️</span><div class="res-title">TU PERFIL</div>
+  <div style="text-align:center"><div class="res-skill-badge">Elegí Ya</div></div>
+  <div id="rs4content"></div>
+  <div class="btn-row" id="rs4b"></div>
 </div>
 
-<!-- ══════════════════ REPORTE FINAL COMPLETO ══════════════════ -->
+<!-- FINAL -->
 <div id="screen-final" class="screen">
-  <span class="result-icon">🏆</span>
-  <div class="result-title">REPORTE CLUTCH COMPLETO</div>
+  <span class="res-icon">🏆</span>
+  <div class="res-title">TU PERFIL MENTAL</div>
   <div class="divider center"></div>
-
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('general')">General</button>
-    <button class="tab" onclick="switchTab('r1')">R01</button>
-    <button class="tab" onclick="switchTab('r2')">R02</button>
-    <button class="tab" onclick="switchTab('r3')">R03</button>
-    <button class="tab" onclick="switchTab('r4')">R04</button>
-  </div>
-
-  <div id="tab-general">
-    <div class="stats-grid" id="final-stats-general"></div>
-    <div class="semaforo-result" id="final-sem"></div>
-  </div>
-  <div id="tab-r1" style="display:none"><div class="round-result-header">DECISIÓN INSTANTÁNEA</div><div class="stats-grid" id="final-stats-r1"></div></div>
-  <div id="tab-r2" style="display:none"><div class="round-result-header">BAJO PRESIÓN</div><div class="stats-grid" id="final-stats-r2"></div></div>
-  <div id="tab-r3" style="display:none"><div class="round-result-header">SEMÁFORO DEL DEPORTISTA</div><div class="semaforo-result" id="final-sem-r3" style="margin-top:0"></div></div>
-  <div id="tab-r4" style="display:none"><div class="round-result-header">ELEGÍ YA</div><div class="stats-grid" id="final-stats-r4"></div></div>
-
-  <div class="reflexion-title">🧠 Preguntas de Reflexión</div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Dónde decidiste con más facilidad?</p></div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Dónde dudaste más?</p></div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Qué te hizo dudar?</p></div>
-  <div class="reflexion-q"><div class="dot"></div><p>¿Qué descubriste sobre vos?</p></div>
-
-  <div class="btn-row">
-    <button class="btn btn-primary" onclick="resetGame()">🔄 VOLVER A JUGAR</button>
-  </div>
+  <div id="final-content"></div>
+  <div class="rfx-title">Para trabajar con tu coach</div>
+  <div class="rfx-q"><div class="d"></div><p id="rfx1"></p></div>
+  <div class="rfx-q"><div class="d"></div><p id="rfx2"></p></div>
+  <div class="rfx-q"><div class="d"></div><p id="rfx3"></p></div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="resetGame()">↺ VOLVER A JUGAR</button></div>
 </div>
 
-</div><!-- /app -->
-
+</div>
 <script>
-/* ════════════════════════════════
-   DATA
-════════════════════════════════ */
-const DATA = {
-  r1: { time:3, questions:[
-    {q:"¿Último tiro o última asistencia?",a:["🏀 Último tiro","🤝 Última asistencia"]},
-    {q:"¿Ser capitán o goleador del equipo?",a:["🏅 Capitán","⭐ Goleador"]},
-    {q:"¿Entrenar solo o entrenar con un compañero mejor que vos?",a:["🎯 Solo","💪 Con uno mejor"]},
-    {q:"¿Ganar un campeonato o ser MVP?",a:["🏆 Campeonato","🥇 MVP"]},
-    {q:"¿Entrenar 2 horas o 1 hora con máxima calidad?",a:["⏱ 2 horas","⚡ 1h máxima calidad"]},
-    {q:"¿Corregir un error técnico o mejorar tu mentalidad?",a:["🔧 Error técnico","🧠 Mentalidad"]},
-    {q:"¿Jugar en un equipo donde sos figura o donde competís por minutos?",a:["⭐ Soy figura","🔥 Compito por minutos"]},
-    {q:"¿Meter un triple o hacer una gran defensa?",a:["🎯 Triple","🛡 Gran defensa"]},
-    {q:"¿Tener más talento o más disciplina?",a:["✨ Talento","📅 Disciplina"]},
-    {q:"¿Ganar por uno o perder por uno jugando excelente?",a:["🏆 Ganar por uno","💎 Perder jugando excelente"]},
-    {q:"¿Escuchar al entrenador o seguir tu instinto?",a:["👂 Entrenador","⚡ Mi instinto"]},
-    {q:"¿Arriesgar o jugar seguro?",a:["🎲 Arriesgar","🛡 Jugar seguro"]},
-    {q:"¿Ser rápido o ser inteligente?",a:["⚡ Rápido","🧠 Inteligente"]},
-    {q:"¿Jugar todo el partido o cerrar los últimos dos minutos?",a:["⏱ Todo el partido","🔥 Últimos 2 min"]},
-    {q:"¿Tener confianza o concentración perfecta?",a:["💪 Confianza","🎯 Concentración perfecta"]},
-  ]},
-  r2: { time:5, questions:[
-    {q:"Quedan 5 segundos. ¿Atacás el aro o tirás de tres?",a:["🏃 Ataco el aro","🎯 Tiro de tres"]},
-    {q:"Vas 0 de 7 en tiros. ¿Seguís lanzando o cambiás tu juego?",a:["🏀 Sigo lanzando","🔄 Cambio mi juego"]},
-    {q:"Un rival te provoca. ¿Ignorás o respondés?",a:["😶 Ignoro","💬 Respondo"]},
-    {q:"Tu entrenador te reta delante de todos. ¿Preguntás después o lo dejás pasar?",a:["💬 Pregunto después","🤐 Lo dejo pasar"]},
-    {q:"Te cobran una falta injusta. ¿Hablás o seguís jugando?",a:["🗣 Hablo","▶ Sigo jugando"]},
-    {q:"Estás agotado. ¿Pedís cambio o seguís?",a:["🔄 Pido cambio","💪 Sigo"]},
-    {q:"Tu compañero está solo y vos venís encendido. ¿Pasás o tirás?",a:["🤝 Paso","🏀 Tiro"]},
-    {q:"Erraste el tiro anterior. ¿Pedís la siguiente pelota o esperás?",a:["🙋 Pido la pelota","⏳ Espero"]},
-    {q:"Te quedan dos faltas para quedar afuera. ¿Defendés igual o más conservador?",a:["🛡 Igual que siempre","⚠ Más conservador"]},
-    {q:"Tu equipo pierde por mucho. ¿Seguís compitiendo igual o bajás un poco?",a:["🔥 Compito igual","📉 Bajo un poco"]},
-    {q:"Entrás desde el banco faltando dos minutos. ¿Buscás protagonismo o hacés lo simple?",a:["⭐ Busco protagonismo","✅ Hago lo simple"]},
-    {q:"Sentís nervios antes del partido. ¿Lo contás o te lo guardás?",a:["💬 Lo cuento","🤐 Me lo guardo"]},
-    {q:"Te duele algo físicamente. ¿Avisás o seguís?",a:["🚨 Aviso","💪 Sigo"]},
-    {q:"El árbitro te tiene entre ojos. ¿Te adaptás o protestás?",a:["🧘 Me adapto","🗣 Protesto"]},
-    {q:"El entrenador cambia una jugada que te gustaba. ¿Aceptás o insistís?",a:["✅ Acepto","💬 Insisto"]},
-  ]},
-  r3:[
-    "Entrenar un día que no tengo ganas.",
-    "Pedir ayuda cuando estoy trabado.",
-    "Llegar 20 minutos antes.",
-    "Quedarme practicando después.",
-    "Reconocer un error delante del equipo.",
-    "Hablar con el entrenador sobre algo que me preocupa.",
-    "Tirar el último lanzamiento.",
-    "Defender al mejor rival.",
-    "Levantar a un compañero que está jugando mal.",
-    "Mirar un video de mis errores.",
-    "Llevar un registro de hábitos.",
-    "Dejar el celular una hora antes de dormir.",
-    "Entrenar aunque llueva.",
-    "Jugar en una posición que no me gusta.",
-    "Aceptar que otro compañero está mejor hoy.",
-    "Volver a intentarlo después de una mala actuación.",
-    "Levantarme temprano para entrenar.",
-    "Cambiar un hábito que me perjudica.",
-    "Ser suplente sin dejar de esforzarme.",
-    "Competir contra alguien mejor que yo.",
-  ],
-  r4:[
-    ["¿Fracasar?","¿Ganar?"],
-    ["¿Talento?","¿Constancia?"],
-    ["¿Entrenador exigente?","¿Motivador?"],
-    ["¿Confianza?","¿Disciplina?"],
-    ["¿Entrenar más?","¿Pensar mejor?"],
-    ["¿Esperar?","¿Actuar?"],
-    ["¿Cabeza?","¿Habilidad?"],
-    ["¿Actitud?","¿Resultado?"],
-    ["¿Valiente?","¿Perfecto?"],
-    ["¿Lo que hacés al ganar?","¿Lo que hacés al perder?"],
-  ]
+/* ═══ SKILLS FRAMEWORK ═══ */
+const SKILLS = {
+  DECISION:    { name:"Decisión bajo presión",   color:"#FF6B00", desc:"Tomás decisiones rápidas y asertivas cuando más importa." },
+  REGULACION:  { name:"Regulación emocional",    color:"#3498DB", desc:"Manejás tus emociones sin que te bloqueen ni te saquen del partido." },
+  LIDERAZGO:   { name:"Liderazgo",               color:"#2ECC71", desc:"Empujás al equipo desde adentro, con acciones y actitud." },
+  CONFIANZA:   { name:"Confianza",               color:"#9B59B6", desc:"Creés en vos mismo incluso cuando el partido está en contra." },
+  RESILIENCIA: { name:"Resiliencia",             color:"#F1C40F", desc:"Te recuperás rápido del error y seguís compitiendo." },
+  EVASION:     { name:"Tendencia a evadir",      color:"#E74C3C", desc:"Tendés a evitar la responsabilidad o el conflicto en momentos clave." },
+  DEPENDENCIA: { name:"Dependencia externa",     color:"#E67E22", desc:"Necesitás validación externa para animarte a actuar." },
 };
 
-/* ════════════════════════════════
-   STATE
-════════════════════════════════ */
-let G = {};
+const INSIGHTS = {
+  DECISION:    { f:"Tomás decisiones rápidas y asertivas. Bajo presión no dudás — ejecutás.", b:"Hay momentos donde la duda aparece antes de la acción. Trabajar la confianza en el proceso.", a:"Esta semana: en cada entrenamiento, tomá la primera decisión que te salga sin cuestionarla." },
+  REGULACION:  { f:"Manejás bien tus emociones. Las situaciones difíciles no te sacan del partido.", b:"Las emociones a veces te afectan más de lo que mostrás. Trabajar la regulación interna.", a:"Esta semana: practicá una respiración de 4 tiempos antes de cada tiempo muerto." },
+  LIDERAZGO:   { f:"Empujás al equipo desde adentro. Tu actitud contagia.", b:"En algunos momentos esperás que otros lideren. Tu equipo necesita tu voz.", a:"Esta semana: decile algo específico y concreto a un compañero en cada entrenamiento." },
+  CONFIANZA:   { f:"Creés en vos mismo incluso cuando el partido está en contra. Eso es difícil de entrenar.", b:"La confianza fluctúa según los resultados. Necesitás una base que no dependa del rendimiento.", a:"Esta semana: anotá 3 cosas que hiciste bien en cada entrenamiento, sin importar el resultado." },
+  RESILIENCIA: { f:"Te recuperás rápido del error. No te quedás pegado al pasado.", b:"Los errores te afectan más de lo que admitís. El proceso de soltar requiere trabajo.", a:"Esta semana: cuando cometas un error, decite 'siguiente jugada' y pasá. Sin excepción." },
+  EVASION:     { f:"Reconocer la tendencia a evadir ya es el primer paso real.", b:"Tendés a evitar la responsabilidad en momentos clave. Eso te limita más de lo que creés.", a:"Esta semana: identificá un momento donde evitaste algo difícil y hacelo diferente." },
+  DEPENDENCIA: { f:"Valorás la opinión de los demás — eso muestra que te importa el entorno.", b:"Necesitás validación externa para actuar. Tu confianza tiene que venir de adentro.", a:"Esta semana: tomá UNA decisión importante en el partido sin mirar al banco." },
+};
 
-function resetG() {
-  G = {
-    mode: null,           // 'all' | 'single'
-    singleRound: null,    // 1-4
-    currentQ: 0,
-    timerInterval: null,
-    questionStart: 0,
-    // per-round stats
-    r1: { times:[], decisions:0 },
-    r2: { times:[], decisions:0 },
-    r3: { times:[], decisions:0, green:0, yellow:0, red:0 },
-    r4: { times:[], decisions:0 },
+/* ═══ DATA ═══ */
+const D = {
+  r1: { time:4, qs:[
+    {q:"Erraste los últimos tres tiros. Te vuelven a dar la pelota. ¿Qué pasa en tu cabeza?",a:[{t:"La quiero — es mi momento de revancha",s:"CONFIANZA"},{t:"La recibo pero dudo antes de ejecutar",s:"EVASION"},{t:"Preferiría que la tome otro esta vez",s:"EVASION"},{t:"Respiro, ejecuto mi rutina y tiro",s:"DECISION"}]},
+    {q:"Tu compañero comete el mismo error por tercera vez. ¿Cómo reaccionás?",a:[{t:"Lo aliento — en este momento lo necesita",s:"LIDERAZGO"},{t:"Me frustro en silencio y trato de cubrirlo",s:"REGULACION"},{t:"Le digo algo constructivo en el próximo tiempo muerto",s:"LIDERAZGO"},{t:"Espero que el entrenador lo resuelva",s:"DEPENDENCIA"}]},
+    {q:"Perdiste un partido que debían ganar. El vestuario está en silencio. ¿Qué hacés?",a:[{t:"Me quedo procesando solo en silencio",s:"REGULACION"},{t:"Trato de levantar a algún compañero",s:"LIDERAZGO"},{t:"Expreso lo que siento aunque incomode",s:"CONFIANZA"},{t:"Espero que hable el capitán o el entrenador",s:"DEPENDENCIA"}]},
+    {q:"El rival que tenés que defender es el mejor del torneo. ¿Qué sentís antes de salir?",a:[{t:"Adrenalina — es el desafío que quería",s:"CONFIANZA"},{t:"Algo de miedo, pero lo uso para activarme",s:"REGULACION"},{t:"Presión — no quiero quedar mal frente a todos",s:"DEPENDENCIA"},{t:"Concentración — me preparé para esto",s:"DECISION"}]},
+    {q:"El árbitro te cobra una falta injusta en un momento clave. ¿Qué hacés?",a:[{t:"Me callo inmediatamente y foco en el partido",s:"REGULACION"},{t:"Reclamo porque es importante hacer notar la injusticia",s:"CONFIANZA"},{t:"Me queda la bronca adentro y me afecta el juego",s:"EVASION"},{t:"Hago el gesto pero en dos segundos ya lo solté",s:"RESILIENCIA"}]},
+    {q:"El partido está igualado y te dan la responsabilidad del último ataque. ¿Qué sentís?",a:[{t:"Quiero la pelota — es exactamente para lo que entrené",s:"CONFIANZA"},{t:"Presión — el miedo a fallar está presente",s:"EVASION"},{t:"Nervios mezclados con adrenalina — y los uso",s:"REGULACION"},{t:"Preferiría que la tome alguien que viene más suelto",s:"DEPENDENCIA"}]},
+    {q:"Cometiste un error grave. Quedan 5 minutos. ¿En qué pensás?",a:[{t:"En la próxima jugada — solo en eso",s:"RESILIENCIA"},{t:"No puedo sacarme el error de la cabeza",s:"EVASION"},{t:"En cómo enmendarlo en las próximas jugadas",s:"DECISION"},{t:"En que el entrenador me va a sacar",s:"DEPENDENCIA"}]},
+    {q:"Tu entrenador te critica delante de todos en el tiempo muerto. ¿Cómo lo tomás?",a:[{t:"Lo acepto, anoto lo que me dice y salgo a corregirlo",s:"RESILIENCIA"},{t:"Me duele pero trato de escuchar",s:"REGULACION"},{t:"Me pongo a la defensiva aunque no lo muestre",s:"EVASION"},{t:"Me bloquea — me cuesta jugar bien después",s:"EVASION"}]},
+    {q:"Tu equipo empieza a bajar el nivel cuando van ganando. ¿Qué hacés?",a:[{t:"Subo mi intensidad y trato de contagiarlos",s:"LIDERAZGO"},{t:"Espero que el entrenador diga algo en el tiempo muerto",s:"DEPENDENCIA"},{t:"Bajo con ellos, total ya ganamos",s:"EVASION"},{t:"Les digo algo para activarlos",s:"LIDERAZGO"}]},
+    {q:"Te quedás en la banca cuando más querías jugar. ¿Qué pasa por tu cabeza?",a:[{t:"Apoyo al equipo y espero mi turno preparado",s:"REGULACION"},{t:"Me desconecto — es difícil sostener el foco",s:"EVASION"},{t:"Me pregunto qué hice mal para merecer esto",s:"DEPENDENCIA"},{t:"Sigo atento al partido para entrar listo cuando me llamen",s:"DECISION"}]},
+    {q:"Estás en racha, metiste todo. ¿Qué cambia en tu juego?",a:[{t:"Me suelto más — confío más en lo que hago",s:"CONFIANZA"},{t:"Trato de no cambiar nada, no quiero romper el ritmo",s:"REGULACION"},{t:"Busco más la pelota — quiero aprovechar el momento",s:"DECISION"},{t:"Me preocupa que se corte — juego más conservador",s:"EVASION"}]},
+    {q:"El partido terminó y jugaste muy mal. ¿Cómo cerrás ese día?",a:[{t:"Lo analizo, saco el aprendizaje y lo suelto",s:"RESILIENCIA"},{t:"Me quedo dando vueltas con cada error toda la noche",s:"EVASION"},{t:"Busco a alguien con quien hablarlo para procesarlo",s:"REGULACION"},{t:"Entreno el doble al día siguiente para borrar esa imagen",s:"RESILIENCIA"}]},
+    {q:"Tu entrenador te pide que juegues en una posición que no es la tuya. ¿Cómo lo tomás?",a:[{t:"Lo acepto — confío en la decisión aunque no la entienda",s:"REGULACION"},{t:"Lo hago pero no me siento cómodo y se nota",s:"EVASION"},{t:"Le pregunto por qué para entender antes de salir",s:"DECISION"},{t:"Lo tomo como un desafío — puede salir bien",s:"CONFIANZA"}]},
+    {q:"Tu mejor jugada del partido nadie la vio ni la reconoció. ¿Cómo te afecta?",a:[{t:"Nada — el resultado es lo que vale, no el reconocimiento",s:"CONFIANZA"},{t:"Un poco — me gusta que noten mi trabajo",s:"DEPENDENCIA"},{t:"Me frustra bastante — trabajo para que se vea",s:"DEPENDENCIA"},{t:"No lo necesito — yo sé lo que hice",s:"CONFIANZA"}]},
+    {q:"Tu entrenador te saca en el peor momento del partido. ¿Qué hacés?",a:[{t:"Me siento, respiro y apoyo al equipo desde el banco",s:"REGULACION"},{t:"Espero que termine el partido y le pregunto con calma",s:"REGULACION"},{t:"Me quedo callado pero me hierve por dentro todo el partido",s:"EVASION"},{t:"Le hago saber de alguna forma que no estoy de acuerdo",s:"CONFIANZA"}]},
+  ]},
+
+  r2: { time:5, qs:[
+    {ctx:"Final del torneo. Tu equipo pierde por 2. Quedan 20 segundos.",q:"El base te da la pelota y se va. Estás solo frente al aro.",a:[{t:"Ataco el aro sin dudarlo",s:"DECISION"},{t:"Busco a alguien más libre aunque tenga poco tiempo",s:"EVASION"},{t:"Tiro de tres — es lo que hay",s:"CONFIANZA"},{t:"Me paralizo un segundo y pierdo la oportunidad",s:"EVASION"}]},
+    {ctx:"Llevas 4 partidos seguidos sin anotar.",q:"Tu familia vino a verte hoy. ¿Eso te ayuda o te pesa?",a:[{t:"Me activa — juego para ellos y eso me libera",s:"CONFIANZA"},{t:"Me pesa — quiero quedar bien y eso me tensa",s:"DEPENDENCIA"},{t:"No cambia nada — mi rendimiento no depende de quién mira",s:"DECISION"},{t:"Mezcla de los dos — los quiero ver orgullosos",s:"REGULACION"}]},
+    {ctx:"Van perdiendo 15 puntos. Tu entrenador te mira desde el banco.",q:"¿Qué sentís con esa mirada?",a:[{t:"Presión — no quiero decepcionarlo",s:"DEPENDENCIA"},{t:"Responsabilidad — me activa a dar más",s:"LIDERAZGO"},{t:"Nada especial — foco en el partido",s:"DECISION"},{t:"Incomodidad — siento que me va a sacar",s:"EVASION"}]},
+    {ctx:"Están empatados. Quedan 2 minutos.",q:"El entrenador cambia la jugada que venía funcionando. ¿Tu primera reacción?",a:[{t:"Confío y la ejecuto con todo",s:"REGULACION"},{t:"No estoy de acuerdo pero la hago igual",s:"DECISION"},{t:"Me desconcentra el cambio — pierdo el ritmo",s:"EVASION"},{t:"Me calienta pero lo disimulo",s:"EVASION"}]},
+    {ctx:"Tu rival te provoca verbalmente toda la primera mitad.",q:"¿Cómo lo manejás?",a:[{t:"Lo ignoro completamente — no le doy entidad",s:"REGULACION"},{t:"Lo uso para activarme más en cada jugada",s:"CONFIANZA"},{t:"Me desconcentra aunque trate de no mostrarlo",s:"EVASION"},{t:"En algún momento le respondo para que pare",s:"DECISION"}]},
+    {ctx:"Jugás los mejores minutos del torneo.",q:"El entrenador te saca para darte descanso. ¿Qué sentís?",a:[{t:"Lo entiendo — vuelvo a entrar todavía mejor",s:"REGULACION"},{t:"Me frustra — quería seguir en ese ritmo",s:"CONFIANZA"},{t:"Le hago saber que quiero volver enseguida",s:"DECISION"},{t:"Me cuesta salir del flow cuando me sientan",s:"EVASION"}]},
+    {ctx:"Primer cuarto: erraste absolutamente todo.",q:"Tu cuerpo dice parar. Tu cabeza dice seguir. ¿A quién escuchás?",a:[{t:"A mi cuerpo — si no rindo, no le sirvo al equipo",s:"DECISION"},{t:"A mi cabeza — esto se puede dar vuelta",s:"CONFIANZA"},{t:"Busco el equilibrio — ni me rindo ni me fuerzo",s:"REGULACION"},{t:"Espero que el coach decida por mí",s:"DEPENDENCIA"}]},
+    {ctx:"El partido más importante del año.",q:"Antes de salir sentís que hoy no es tu día. ¿Qué hacés con eso?",a:[{t:"Me concentro igual — los sentimientos no dirigen el partido",s:"DECISION"},{t:"Se lo digo al coach — no puedo ocultarlo",s:"DEPENDENCIA"},{t:"Encuentro algo que me active antes de salir",s:"REGULACION"},{t:"Uso esa tensión como combustible",s:"CONFIANZA"}]},
+    {ctx:"Metiste el tiro ganador la semana pasada.",q:"Hoy el pensamiento 'y si fallo' aparece antes del tiro. ¿Qué hacés?",a:[{t:"Respiro, reseteo y ejecuto",s:"REGULACION"},{t:"Me foco en la técnica — ejecuto lo que entrené",s:"DECISION"},{t:"Recuerdo el último que metí y uso esa imagen",s:"CONFIANZA"},{t:"El pensamiento me paraliza aunque trate de ignorarlo",s:"EVASION"}]},
+    {ctx:"Tu mejor amigo del equipo está en la mejor racha del año. Vos no.",q:"¿Qué sentís cuando lo ves jugar bien?",a:[{t:"Alegría genuina — me alegra que le vaya bien",s:"LIDERAZGO"},{t:"Algo de envidia — lo reconozco aunque me incomode",s:"EVASION"},{t:"Me motiva a mejorar yo también",s:"CONFIANZA"},{t:"Mezcla de los dos — lo celebro y compito conmigo mismo",s:"REGULACION"}]},
+    {ctx:"Tercer cuarto. Estás agotado. El partido está parejo.",q:"El coach te mira esperando más. ¿Lo das?",a:[{t:"Sí — siempre hay una reserva más",s:"CONFIANZA"},{t:"Doy lo que tengo — ni más ni menos",s:"DECISION"},{t:"Espero que me lo pida directamente",s:"DEPENDENCIA"},{t:"Saco reservas que no sabía que tenía",s:"RESILIENCIA"}]},
+    {ctx:"Tu equipo acaba de remontar un partido que perdían 15.",q:"¿Cómo entrás en los últimos 3 minutos?",a:[{t:"Con más energía — la inercia me empuja",s:"CONFIANZA"},{t:"Con calma — el trabajo está hecho, ahora hay que cerrarlo",s:"DECISION"},{t:"Con euforia que a veces me saca del foco",s:"EVASION"},{t:"Igual que siempre — el partido dura hasta el final",s:"REGULACION"}]},
+    {ctx:"El entrenador señala tus errores frente a todo el equipo.",q:"¿Cómo lo procesás?",a:[{t:"Lo tomo como información para mejorar",s:"RESILIENCIA"},{t:"Me duele pero trato de escuchar",s:"REGULACION"},{t:"Me desconecto emocionalmente — no lo tomo bien",s:"EVASION"},{t:"Me pregunto qué pensarán los compañeros de mí",s:"DEPENDENCIA"}]},
+    {ctx:"Van ganando por 20. El partido está decidido.",q:"¿Qué pasa con tu intensidad?",a:[{t:"La mantengo igual — así es como se forma el hábito",s:"DECISION"},{t:"La bajo un poco — no tiene sentido gastar más",s:"EVASION"},{t:"La uso para practicar cosas que no haría en un partido parejo",s:"CONFIANZA"},{t:"Depende de cómo me sienta físicamente",s:"REGULACION"}]},
+    {ctx:"Último partido de la temporada.",q:"Sabés que el año que viene podrías no seguir. ¿Eso te afecta hoy?",a:[{t:"Me hace jugar mejor — todo está en juego",s:"DECISION"},{t:"Me genera ansiedad que me saca del presente",s:"EVASION"},{t:"No pienso en eso — foco total en el partido",s:"REGULACION"},{t:"Lo uso como motivación extra",s:"CONFIANZA"}]},
+  ]},
+
+  r3: {
+    steps: [
+      {
+        id:"palabra",
+        title:"Tu palabra clave",
+        desc:"Cuando todo se complica, ¿qué palabra te va a recordar quién sos? Una sola palabra que te active, te calme o te enfoque.",
+        opts:[
+          {emoji:"🎯",text:"PRESENTE",sub:"Para volver al ahora cuando te perdés",val:"PRESENTE"},
+          {emoji:"💪",text:"CONFÍO",sub:"Para activar tu autoconfianza",val:"CONFÍO"},
+          {emoji:"🔄",text:"SIGUIENTE",sub:"Para soltar el error y seguir",val:"SIGUIENTE"},
+          {emoji:"🔥",text:"AHORA",sub:"Para activar la intensidad cuando bajás",val:"AHORA"},
+          {emoji:"🛡",text:"FIRME",sub:"Para sostener la posición bajo presión",val:"FIRME"},
+          {emoji:"⚡",text:"VAS",sub:"Para empujarte cuando dudás",val:"VAS"},
+        ]
+      },
+      {
+        id:"gesto",
+        title:"Tu gesto de activación",
+        desc:"El cuerpo y la mente están conectados. Un gesto físico simple puede resetear tu estado mental en segundos. ¿Cuál va a ser el tuyo?",
+        opts:[
+          {emoji:"✊",text:"Puño cerrado",sub:"Activación y determinación",val:"Puño cerrado"},
+          {emoji:"👋",text:"Palmada en el muslo",sub:"Reset rápido post-error",val:"Palmada en el muslo"},
+          {emoji:"🤲",text:"Manos al pecho",sub:"Conexión con el propósito",val:"Manos al pecho"},
+          {emoji:"👆",text:"Dedo apuntando al aro",sub:"Foco en el objetivo",val:"Dedo apuntando al aro"},
+          {emoji:"🫁",text:"Respiración profunda",sub:"Calma y regulación",val:"Respiración profunda"},
+          {emoji:"💢",text:"Golpe suave al pecho",sub:"Energía y presencia",val:"Golpe suave al pecho"},
+        ]
+      },
+      {
+        id:"imagen",
+        title:"Tu imagen mental",
+        desc:"Los mejores atletas del mundo usan imágenes mentales. En el momento de mayor presión, ¿qué imagen te va a dar fuerza?",
+        opts:[
+          {emoji:"🏆",text:"Mi mejor partido",sub:"La imagen de cuando estuve en flow",val:"mi mejor partido"},
+          {emoji:"👨‍👩‍👦",text:"Mi familia en la tribuna",sub:"Las personas que me impulsan",val:"mi familia mirándome"},
+          {emoji:"🎯",text:"La pelota entrando al aro",sub:"Visualización del éxito",val:"la pelota entrando"},
+          {emoji:"💪",text:"Yo levantándome después de un error",sub:"Mi capacidad de recuperarme",val:"yo levantándome del error"},
+          {emoji:"🏃",text:"Yo en el mejor momento del entrenamiento",sub:"La versión más fuerte que conozco",val:"mi mejor entrenamiento"},
+          {emoji:"🤝",text:"Mi equipo celebrando",sub:"El objetivo colectivo",val:"el equipo celebrando"},
+        ]
+      },
+      {
+        id:"cuando",
+        title:"¿Cuándo vas a usarla?",
+        desc:"Un ancla funciona cuando sabés exactamente en qué momento activarla. ¿Cuál es TU momento?",
+        opts:[
+          {emoji:"❌",text:"Cuando cometo un error grave",sub:"Reset post-error",val:"cuando cometo un error grave"},
+          {emoji:"😤",text:"Cuando un rival me provoca",sub:"Control de la reacción",val:"cuando un rival me provoca"},
+          {emoji:"📉",text:"Cuando mi equipo baja la energía",sub:"Activación del liderazgo",val:"cuando el equipo baja"},
+          {emoji:"😰",text:"Antes de un tiro libre decisivo",sub:"Concentración en el momento clave",val:"antes de un tiro libre decisivo"},
+          {emoji:"🔴",text:"Cuando el entrenador me critica",sub:"Regulación de la respuesta emocional",val:"cuando me critican"},
+          {emoji:"💭",text:"Cuando mi cabeza empieza a irse",sub:"Vuelta al presente",val:"cuando me desconcentro"},
+        ]
+      },
+      {
+        id:"compromisom",
+        title:"Tu compromiso",
+        desc:"Construiste tu ancla. Ahora elegís cómo la vas a entrenar esta semana.",
+        opts:[
+          {emoji:"🎯",text:"La practico en cada entrenamiento",sub:"Antes de cada ejercicio de presión",val:"practicarla en cada entrenamiento"},
+          {emoji:"📓",text:"La escribo y la pongo donde la vea",sub:"En el cuaderno, el celular o el vestuario",val:"escribirla y ponerla visible"},
+          {emoji:"💬",text:"Se la cuento a mi entrenador",sub:"Para que me ayude a recordarla",val:"contársela a mi entrenador"},
+          {emoji:"🏀",text:"La uso en el próximo partido",sub:"En un momento real de presión",val:"usarla en el próximo partido"},
+        ]
+      }
+    ]
+  },
+
+  r4: { time:3, qs:[
+    [{t:"Pedir la pelota cuando erraste todo",s:"CONFIANZA"},{t:"Esperar a que estés mejor para pedirla",s:"EVASION"}],
+    [{t:"Ganar de cualquier manera",s:"DECISION"},{t:"Perder jugando bien",s:"CONFIANZA"}],
+    [{t:"Ser el que anota",s:"DECISION"},{t:"Ser el que hace anotar",s:"LIDERAZGO"}],
+    [{t:"Entrenador que te exige aunque duela",s:"RESILIENCIA"},{t:"Entrenador que te contiene cuando fallás",s:"DEPENDENCIA"}],
+    [{t:"Reconocer el error en el momento",s:"RESILIENCIA"},{t:"Procesar el error solo cuando pase el partido",s:"REGULACION"}],
+    [{t:"Hablar cuando el equipo baja",s:"LIDERAZGO"},{t:"Liderar con el ejemplo sin decir nada",s:"DECISION"}],
+    [{t:"Miedo a fallar",s:"EVASION"},{t:"Miedo a no haberlo intentado",s:"CONFIANZA"}],
+    [{t:"Confiar en el plan del entrenador",s:"REGULACION"},{t:"Confiar en tu instinto en el momento",s:"DECISION"}],
+    [{t:"Ser figura aunque el equipo pierda",s:"EVASION"},{t:"Ser fundamental aunque no se note",s:"LIDERAZGO"}],
+    [{t:"Lo que hacés cuando ganás",s:"CONFIANZA"},{t:"Lo que hacés cuando perdés",s:"RESILIENCIA"}],
+  ]}
+};
+
+/* ═══ STATE ═══ */
+let G={};
+function resetG(){
+  G={mode:null,single:null,q:0,ti:null,qs:0,
+    ancla:{palabra:null,gesto:null,imagen:null,cuando:null,compromiso:null},
+    skills:{DECISION:0,REGULACION:0,LIDERAZGO:0,CONFIANZA:0,RESILIENCIA:0,EVASION:0,DEPENDENCIA:0},
+    r1:{skills:{DECISION:0,REGULACION:0,LIDERAZGO:0,CONFIANZA:0,RESILIENCIA:0,EVASION:0,DEPENDENCIA:0}},
+    r2:{skills:{DECISION:0,REGULACION:0,LIDERAZGO:0,CONFIANZA:0,RESILIENCIA:0,EVASION:0,DEPENDENCIA:0}},
+    r4:{skills:{DECISION:0,REGULACION:0,LIDERAZGO:0,CONFIANZA:0,RESILIENCIA:0,EVASION:0,DEPENDENCIA:0}},
   };
 }
 resetG();
 
-/* ════════════════════════════════
-   SCREENS
-════════════════════════════════ */
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
+function recordSkill(rk,skill){if(rk!=='r3'){G[rk].skills[skill]++;G.skills[skill]++;}}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+function cd(from,cb){const ov=document.getElementById('cdOverlay'),ne=document.getElementById('cdNum');ov.classList.add('on');let n=from;ne.textContent=n;const t=setInterval(()=>{n--;if(n<=0){clearInterval(t);ov.classList.remove('on');cb();}else{ne.textContent=n;ne.style.animation='none';void ne.offsetWidth;ne.style.animation='popIn .5s cubic-bezier(.17,.67,.4,1.4)';}},800);}
+function playAll(){resetG();G.mode='all';show('rt1');}
+function playSingle(n){resetG();G.mode='single';G.single=n;show('rt'+n);}
+function resetGame(){resetG();show('splash');}
+function startRound(n){G.q=0;cd(3,()=>{show('r'+n);window[['','nextQ1','nextQ2','nextQ3','nextQ4'][n]]();});}
+function afterRound(n){stopT();if(G.mode==='single'){buildReport(n);show('res'+n);}else{n<4?show('rt'+(n+1)):buildFinalReport();}}
+function startT(sec,numId,onEnd){stopT();const num=document.getElementById(numId);let t=sec;num.className='timer-box';num.textContent=t;G.qs=Date.now();G.ti=setInterval(()=>{t-=.1;const r=Math.ceil(t);num.textContent=r>0?r:0;if(t<=sec*.5)num.className='timer-box warn';if(t<=sec*.25)num.className='timer-box danger';if(t<=0){clearInterval(G.ti);onEnd();}},100);}
+function stopT(){clearInterval(G.ti);}
+
+function nextQ1(){const qs=D.r1.qs;if(G.q>=qs.length){afterRound(1);return;}const q=qs[G.q],tot=qs.length;document.getElementById('r1c').textContent=`${G.q+1}/${tot}`;document.getElementById('r1p').style.width=`${(G.q/tot)*100}%`;document.getElementById('r1q').textContent=q.q;const o=document.getElementById('r1o');o.innerHTML='';const pick=(s)=>{stopT();recordSkill('r1',s);G.q++;nextQ1();};q.a.forEach(a=>{const b=document.createElement('button');b.className='btn-answer';b.textContent=a.t;b.onclick=()=>pick(a.s);o.appendChild(b);});startT(D.r1.time,'r1t',()=>pick(q.a[Math.floor(Math.random()*q.a.length)].s));}
+
+function nextQ2(){const qs=D.r2.qs;if(G.q>=qs.length){afterRound(2);return;}const q=qs[G.q],tot=qs.length;document.getElementById('r2c').textContent=`${G.q+1}/${tot}`;document.getElementById('r2p').style.width=`${(G.q/tot)*100}%`;const ctx=document.getElementById('r2ctx');if(q.ctx){ctx.style.display='block';ctx.textContent='📍 '+q.ctx;}else ctx.style.display='none';document.getElementById('r2q').textContent=q.q;const o=document.getElementById('r2o');o.innerHTML='';const pick=(s)=>{stopT();recordSkill('r2',s);G.q++;nextQ2();};q.a.forEach(a=>{const b=document.createElement('button');b.className='btn-answer';b.textContent=a.t;b.onclick=()=>pick(a.s);o.appendChild(b);});startT(D.r2.time,'r2t',()=>pick(q.a[Math.floor(Math.random()*q.a.length)].s));}
+
+/* ═══ ANCLA BUILDER ═══ */
+function nextQ3(){
+  const steps=D.r3.steps;
+  if(G.q>=steps.length){afterRound(3);return;}
+  const step=steps[G.q],tot=steps.length;
+  document.getElementById('r3c').textContent=`Paso ${G.q+1} de ${tot}`;
+  document.getElementById('r3p').style.width=`${((G.q)/tot)*100}%`;
+
+  // Dots
+  const dots=document.getElementById('r3dots');
+  dots.innerHTML=steps.map((_,i)=>`<div class="ancla-dot ${i<G.q?'done':i===G.q?'active':''}"></div>`).join('');
+
+  // Show already built pieces
+  const built=document.getElementById('r3built');
+  const builtPieces=[
+    {id:'palabra',label:'Palabra',icon:'🎯'},
+    {id:'gesto',label:'Gesto',icon:'✊'},
+    {id:'imagen',label:'Imagen',icon:'🧠'},
+    {id:'cuando',label:'Cuándo',icon:'⏰'},
+  ].filter(p=>G.ancla[p.id]);
+  built.innerHTML=builtPieces.map(p=>`
+    <div class="ancla-built">
+      <span style="font-size:1.2rem">${p.icon}</span>
+      <span style="font-family:var(--fc);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);min-width:70px">${p.label}</span>
+      <span style="font-size:.88rem;color:var(--white)">${G.ancla[p.id]}</span>
+    </div>`).join('');
+
+  // Current step
+  const stepEl=document.getElementById('r3step');
+  const cols=step.opts.length===4?'1fr 1fr':'1fr 1fr 1fr';
+  stepEl.innerHTML=`
+    <div class="ancla-step">
+      <div class="ancla-step-title">${step.title}</div>
+      <div class="ancla-step-desc">${step.desc}</div>
+      <div class="ancla-options" style="grid-template-columns:${cols}">
+        ${step.opts.map((o,i)=>`
+          <div class="ancla-opt" onclick="pickAncla('${step.id}','${o.val}')">
+            <span class="ao-emoji">${o.emoji}</span>
+            <div class="ao-text">${o.text}</div>
+            <div class="ao-sub">${o.sub}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
 }
 
-/* ════════════════════════════════
-   COUNTDOWN
-════════════════════════════════ */
-function showCountdown(from, cb) {
-  const ov = document.getElementById('countdownOverlay');
-  const numEl = document.getElementById('countdownNum');
-  ov.classList.add('visible');
-  let n = from;
-  numEl.textContent = n;
-  const t = setInterval(() => {
-    n--;
-    if (n <= 0) { clearInterval(t); ov.classList.remove('visible'); cb(); }
-    else {
-      numEl.textContent = n;
-      numEl.style.animation = 'none'; void numEl.offsetWidth;
-      numEl.style.animation = 'popIn .6s cubic-bezier(.17,.67,.4,1.4)';
-    }
-  }, 800);
+function pickAncla(stepId,val){
+  G.ancla[stepId]=val;
+  G.q++;
+  // Flash animation
+  const step=document.getElementById('r3step');
+  step.style.opacity='0';step.style.transform='translateY(10px)';
+  setTimeout(()=>{step.style.transition='opacity .3s,transform .3s';step.style.opacity='1';step.style.transform='';nextQ3();},300);
 }
 
-/* ════════════════════════════════
-   GAME FLOW
-════════════════════════════════ */
-function playAll() {
-  resetG();
-  G.mode = 'all';
-  showScreen('rt1');
+function nextQ4(){const qs=D.r4.qs;if(G.q>=qs.length){afterRound(4);return;}const tot=qs.length,q=qs[G.q];document.getElementById('r4c').textContent=`${G.q+1}/${tot}`;document.getElementById('r4p').style.width=`${(G.q/tot)*100}%`;const w=document.getElementById('r4dw');w.innerHTML='';const g=document.createElement('div');g.className='duel-grid';const pick=(s)=>{stopT();recordSkill('r4',s);G.q++;w.style.transition='opacity .18s,transform .18s';w.style.opacity='0';w.style.transform='scale(.95)';setTimeout(()=>{w.style.opacity='1';w.style.transform='';nextQ4();},200);};q.forEach(opt=>{const b=document.createElement('button');b.className='btn-duel';b.textContent=opt.t;b.onclick=()=>pick(opt.s);g.appendChild(b);});const vs=document.createElement('div');vs.className='vs-badge';vs.textContent='VS';g.insertBefore(vs,g.children[1]);w.appendChild(g);w.style.opacity='1';w.style.transform='';w.style.transition='opacity .18s,transform .18s';startT(D.r4.time,'r4t',()=>pick(q[Math.floor(Math.random()*q.length)].s));}
+
+/* ═══ REPORT ENGINE ═══ */
+function getProfile(skillsObj){
+  const pos=['DECISION','REGULACION','LIDERAZGO','CONFIANZA','RESILIENCIA'];
+  const neg=['EVASION','DEPENDENCIA'];
+  const top=pos.map(k=>({k,v:skillsObj[k]})).sort((a,b)=>b.v-a.v)[0];
+  const brecha=neg.map(k=>({k,v:skillsObj[k]})).sort((a,b)=>b.v-a.v)[0];
+  return{top,brecha};
 }
 
-function playSingle(n) {
-  resetG();
-  G.mode = 'single';
-  G.singleRound = n;
-  showScreen('rt' + n);
+function skillBars(skillsObj){
+  const total=Object.values(skillsObj).reduce((a,b)=>a+b,0)||1;
+  return ['DECISION','REGULACION','LIDERAZGO','CONFIANZA','RESILIENCIA'].map(k=>{
+    const pct=Math.round((skillsObj[k]/total)*100);
+    const sk=SKILLS[k];
+    return `<div class="perfil-bar-wrap">
+      <div class="perfil-bar-label"><span class="perfil-bar-name">${sk.name}</span><span class="perfil-bar-val">${pct}%</span></div>
+      <div class="perfil-bar"><div class="perfil-bar-fill" style="width:${pct}%;background:${sk.color}"></div></div>
+    </div>`;}).join('');
 }
 
-function startRound(n) {
-  G.currentQ = 0;
-  showCountdown(3, () => {
-    showScreen('r' + n);
-    if (n===1) nextQ_r1();
-    if (n===2) nextQ_r2();
-    if (n===3) nextQ_r3();
-    if (n===4) nextQ_r4();
-  });
-}
-
-function resetGame() { resetG(); showScreen('splash'); }
-
-function afterRound(n) {
-  stopTimer();
-  if (G.mode === 'single') {
-    // show individual result
-    buildSingleResult(n);
-    showScreen('res' + n);
-  } else {
-    // all mode: go to next round transition or final
-    if (n < 4) showScreen('rt' + (n+1));
-    else buildFinalReport();
-  }
-}
-
-/* ════════════════════════════════
-   TIMER
-════════════════════════════════ */
-function startTimer(seconds, arcId, numId, pulseId, onEnd) {
-  stopTimer();
-  const arc   = document.getElementById(arcId);
-  const numEl = document.getElementById(numId);
-  const pulse = pulseId ? document.getElementById(pulseId) : null;
-  const circ  = 201;
-  let t = seconds;
-  arc.style.strokeDashoffset = 0;
-  arc.className = 'timer-arc';
-  numEl.textContent = t;
-  if (pulse) pulse.style.display = 'none';
-  G.questionStart = Date.now();
-  G.timerInterval = setInterval(() => {
-    t -= 0.1;
-    arc.style.strokeDashoffset = circ * (1 - t/seconds);
-    const r = Math.ceil(t);
-    numEl.textContent = r > 0 ? r : 0;
-    if (t <= seconds*.5) arc.className = 'timer-arc warn';
-    if (t <= seconds*.25) { arc.className = 'timer-arc danger'; if(pulse) pulse.style.display='block'; }
-    if (t <= 0) { clearInterval(G.timerInterval); onEnd(); }
-  }, 100);
-}
-
-function stopTimer() { clearInterval(G.timerInterval); }
-
-function recordTime(round) {
-  const elapsed = (Date.now() - G.questionStart) / 1000;
-  G['r'+round].times.push(elapsed);
-  G['r'+round].decisions++;
-}
-
-/* ════════════════════════════════
-   RONDA 1
-════════════════════════════════ */
-function nextQ_r1() {
-  const qs = DATA.r1.questions;
-  if (G.currentQ >= qs.length) { afterRound(1); return; }
-  const q = qs[G.currentQ], total = qs.length;
-  document.getElementById('r1-counter').textContent = `${G.currentQ+1}/${total}`;
-  document.getElementById('r1-progress').style.width = `${(G.currentQ/total)*100}%`;
-  document.getElementById('r1-question').textContent = q.q;
-  const opts = document.getElementById('r1-options'); opts.innerHTML='';
-  q.a.forEach(ans => {
-    const b = document.createElement('button'); b.className='btn btn-answer'; b.textContent=ans;
-    b.onclick = ()=>{ stopTimer(); recordTime(1); G.currentQ++; nextQ_r1(); };
-    opts.appendChild(b);
-  });
-  startTimer(DATA.r1.time,'r1-arc','r1-timer','r1-pulse',()=>{ recordTime(1); G.currentQ++; nextQ_r1(); });
-}
-
-/* ════════════════════════════════
-   RONDA 2
-════════════════════════════════ */
-function nextQ_r2() {
-  const qs = DATA.r2.questions;
-  if (G.currentQ >= qs.length) { afterRound(2); return; }
-  const q = qs[G.currentQ], total = qs.length;
-  document.getElementById('r2-counter').textContent = `${G.currentQ+1}/${total}`;
-  document.getElementById('r2-progress').style.width = `${(G.currentQ/total)*100}%`;
-  document.getElementById('r2-question').textContent = q.q;
-  const opts = document.getElementById('r2-options'); opts.innerHTML='';
-  q.a.forEach(ans => {
-    const b = document.createElement('button'); b.className='btn btn-answer'; b.textContent=ans;
-    b.onclick = ()=>{ stopTimer(); recordTime(2); G.currentQ++; nextQ_r2(); };
-    opts.appendChild(b);
-  });
-  startTimer(DATA.r2.time,'r2-arc','r2-timer','r2-pulse',()=>{ recordTime(2); G.currentQ++; nextQ_r2(); });
-}
-
-/* ════════════════════════════════
-   RONDA 3
-════════════════════════════════ */
-function nextQ_r3() {
-  const qs = DATA.r3;
-  if (G.currentQ >= qs.length) { afterRound(3); return; }
-  const total = qs.length;
-  document.getElementById('r3-counter').textContent = `${G.currentQ+1}/${total}`;
-  document.getElementById('r3-progress').style.width = `${(G.currentQ/total)*100}%`;
-  document.getElementById('r3-question').textContent = qs[G.currentQ];
-  G.questionStart = Date.now();
-}
-
-function answerSemaforo(color) {
-  recordTime(3);
-  G.r3[color]++;
-  G.currentQ++;
-  const qEl = document.getElementById('r3-question');
-  qEl.classList.add('flash');
-  setTimeout(()=>{ qEl.classList.remove('flash'); nextQ_r3(); }, 300);
-}
-
-/* ════════════════════════════════
-   RONDA 4
-════════════════════════════════ */
-function nextQ_r4() {
-  const qs = DATA.r4;
-  if (G.currentQ >= qs.length) { afterRound(4); return; }
-  const total = qs.length, q = qs[G.currentQ];
-  document.getElementById('r4-counter').textContent = `${G.currentQ+1}/${total}`;
-  document.getElementById('r4-progress').style.width = `${(G.currentQ/total)*100}%`;
-  const wrap = document.getElementById('r4-duelo-wrap');
-  wrap.innerHTML='';
-  const grid = document.createElement('div'); grid.className='duelo-wrap';
-  q.forEach((opt,i)=>{
-    const b = document.createElement('button'); b.className='btn-duelo'; b.textContent=opt;
-    b.onclick=()=>{
-      recordTime(4); G.currentQ++;
-      wrap.style.transition='opacity .22s,transform .22s';
-      wrap.style.opacity='0'; wrap.style.transform='scale(.95)';
-      setTimeout(()=>{ wrap.style.opacity='1'; wrap.style.transform=''; nextQ_r4(); },240);
-    };
-    grid.appendChild(b);
-  });
-  const vs=document.createElement('div'); vs.className='vs-label'; vs.textContent='VS';
-  grid.insertBefore(vs, grid.children[1]);
-  wrap.appendChild(grid); wrap.style.opacity='1'; wrap.style.transform='';
-  G.questionStart = Date.now();
-}
-
-/* ════════════════════════════════
-   STATS HELPERS
-════════════════════════════════ */
-function calcStats(roundKey) {
-  const d = G[roundKey];
-  const times = d.times;
-  if (!times.length) return { total:0, avg:'–', fast:0, slow:0 };
-  const avg = (times.reduce((a,b)=>a+b,0)/times.length).toFixed(1);
-  const fast = times.filter(t=>t<2).length;
-  const slow = times.filter(t=>t>3).length;
-  return { total: d.decisions, avg, fast, slow };
-}
-
-function statsHTML(s) {
+function reportHTML(skillsObj){
+  const {top,brecha}=getProfile(skillsObj);
+  const ins=INSIGHTS[top.k]||INSIGHTS['DECISION'];
+  const insB=INSIGHTS[brecha.k]||INSIGHTS['EVASION'];
   return `
-    <div class="stat-box"><div class="stat-num">${s.total}</div><div class="stat-label">Decisiones</div></div>
-    <div class="stat-box"><div class="stat-num">${s.avg}s</div><div class="stat-label">Tiempo promedio</div></div>
-    <div class="stat-box"><div class="stat-num">${s.fast}</div><div class="stat-label">Antes de 2 seg</div></div>
-    <div class="stat-box"><div class="stat-num">${s.slow}</div><div class="stat-label">Más de 3 seg</div></div>`;
+    <div class="perfil-card"><div class="perfil-title">Tu perfil</div>${skillBars(skillsObj)}</div>
+    <div class="insight-grid">
+      <div class="insight-card"><div class="insight-label f">💪 Fortaleza</div><div class="insight-text">${ins.f}</div></div>
+      <div class="insight-card"><div class="insight-label b">🎯 A trabajar</div><div class="insight-text">${insB.b}</div></div>
+    </div>
+    <div class="next-step"><div class="next-step-title">⚡ Tu próximo paso</div><div class="next-step-text">${ins.a}</div></div>
+    <div class="rfx-title">Para reflexionar con tu coach</div>
+    <div class="rfx-q"><div class="d"></div><p>¿Lo que respondiste refleja cómo jugás de verdad?</p></div>
+    <div class="rfx-q"><div class="d"></div><p>¿Qué situación fue la más difícil de responder y por qué?</p></div>
+    <div class="rfx-q"><div class="d"></div><p>¿Hay alguna respuesta que te sorprendió a vos mismo?</p></div>`;
 }
 
-/* ════════════════════════════════
-   SINGLE ROUND RESULTS
-════════════════════════════════ */
-function buildSingleResult(n) {
-  if (n === 3) {
-    document.getElementById('sem-green-res').textContent  = G.r3.green;
-    document.getElementById('sem-yellow-res').textContent = G.r3.yellow;
-    document.getElementById('sem-red-res').textContent    = G.r3.red;
+function anclaReportHTML(){
+  const a=G.ancla;
+  return `
+    <div class="ancla-result-card">
+      <div class="ancla-result-title">Tu Ancla Mental</div>
+      <div class="ancla-result-sub">Construida por vos. Lista para usar en el próximo partido.</div>
+      <div class="ancla-piece"><span class="ancla-piece-icon">🎯</span><div class="ancla-piece-body"><div class="ancla-piece-label">Palabra clave</div><div class="ancla-piece-val">"${a.palabra}"</div></div></div>
+      <div class="ancla-piece"><span class="ancla-piece-icon">✊</span><div class="ancla-piece-body"><div class="ancla-piece-label">Gesto de activación</div><div class="ancla-piece-val">${a.gesto}</div></div></div>
+      <div class="ancla-piece"><span class="ancla-piece-icon">🧠</span><div class="ancla-piece-body"><div class="ancla-piece-label">Imagen mental</div><div class="ancla-piece-val">La imagen de ${a.imagen}</div></div></div>
+      <div class="ancla-piece"><span class="ancla-piece-icon">⏰</span><div class="ancla-piece-body"><div class="ancla-piece-label">Cuándo usarla</div><div class="ancla-piece-val">${a.cuando}</div></div></div>
+      <div class="ancla-piece"><span class="ancla-piece-icon">📅</span><div class="ancla-piece-body"><div class="ancla-piece-label">Tu compromiso</div><div class="ancla-piece-val">Esta semana vas a ${a.compromiso}</div></div></div>
+    </div>
+    <div class="rfx-title">Para reflexionar con tu coach</div>
+    <div class="rfx-q"><div class="d"></div><p>¿Por qué elegiste esa palabra y no otra?</p></div>
+    <div class="rfx-q"><div class="d"></div><p>¿Alguna vez usaste algo parecido sin darte cuenta?</p></div>
+    <div class="rfx-q"><div class="d"></div><p>¿En qué momento del último partido te hubiera servido esta ancla?</p></div>`;
+}
+
+function buildReport(n){
+  if(n===3){
+    document.getElementById('rs3content').innerHTML=anclaReportHTML();
   } else {
-    const s = calcStats('r'+n);
-    document.getElementById('res'+n+'-stats').innerHTML = statsHTML(s);
+    const rk='r'+n;
+    document.getElementById('rs'+n+'content').innerHTML=reportHTML(G[rk].skills);
   }
-  // buttons
-  const btns = document.getElementById('res'+n+'-btns');
-  btns.innerHTML = '';
-  // play again same round
-  const again = document.createElement('button');
-  again.className='btn btn-primary'; again.textContent='🔄 Jugar esta ronda de nuevo';
-  again.onclick = ()=>playSingle(n);
-  btns.appendChild(again);
-  // menu
-  const menu = document.createElement('button');
-  menu.className='btn btn-ghost'; menu.textContent='← Volver al menú';
-  menu.onclick = resetGame;
-  btns.appendChild(menu);
+  const btns=document.getElementById('rs'+n+'b');
+  if(btns){btns.innerHTML='';
+    const a=document.createElement('button');a.className='btn btn-primary';a.textContent='↺ Jugar de nuevo';a.onclick=()=>playSingle(n);btns.appendChild(a);
+    const b=document.createElement('button');b.className='btn btn-ghost';b.textContent='← Menú';b.onclick=resetGame;btns.appendChild(b);}
 }
 
-/* ════════════════════════════════
-   FULL FINAL REPORT
-════════════════════════════════ */
-function buildFinalReport() {
-  // general
-  const allTimes = [...G.r1.times,...G.r2.times,...G.r3.times,...G.r4.times];
-  const total = G.r1.decisions+G.r2.decisions+G.r3.decisions+G.r4.decisions;
-  const avg = allTimes.length ? (allTimes.reduce((a,b)=>a+b,0)/allTimes.length).toFixed(1) : '–';
-  const fast = allTimes.filter(t=>t<2).length;
-  const slow = allTimes.filter(t=>t>3).length;
-  document.getElementById('final-stats-general').innerHTML=`
-    <div class="stat-box"><div class="stat-num">${total}</div><div class="stat-label">Decisiones totales</div></div>
-    <div class="stat-box"><div class="stat-num">${avg}s</div><div class="stat-label">Tiempo promedio</div></div>
-    <div class="stat-box"><div class="stat-num">${fast}</div><div class="stat-label">Antes de 2 seg</div></div>
-    <div class="stat-box"><div class="stat-num">${slow}</div><div class="stat-label">Más de 3 seg</div></div>`;
-  document.getElementById('final-sem').innerHTML=`
-    <div class="sem-res green"><div class="emoji">🟢</div><div class="count">${G.r3.green}</div><div class="name">Lo haría</div></div>
-    <div class="sem-res yellow"><div class="emoji">🟡</div><div class="count">${G.r3.yellow}</div><div class="name">Lo pensaría</div></div>
-    <div class="sem-res red"><div class="emoji">🔴</div><div class="count">${G.r3.red}</div><div class="name">No lo haría</div></div>`;
-  // per-round tabs
-  document.getElementById('final-stats-r1').innerHTML=statsHTML(calcStats('r1'));
-  document.getElementById('final-stats-r2').innerHTML=statsHTML(calcStats('r2'));
-  document.getElementById('final-sem-r3').innerHTML=`
-    <div class="sem-res green"><div class="emoji">🟢</div><div class="count">${G.r3.green}</div><div class="name">Lo haría</div></div>
-    <div class="sem-res yellow"><div class="emoji">🟡</div><div class="count">${G.r3.yellow}</div><div class="name">Lo pensaría</div></div>
-    <div class="sem-res red"><div class="emoji">🔴</div><div class="count">${G.r3.red}</div><div class="name">No lo haría</div></div>`;
-  document.getElementById('final-stats-r4').innerHTML=statsHTML(calcStats('r4'));
-  showScreen('final');
-}
+function buildFinalReport(){
+  const {top,brecha}=getProfile(G.skills);
+  const ins=INSIGHTS[top.k]||INSIGHTS['DECISION'];
+  const insB=INSIGHTS[brecha.k]||INSIGHTS['EVASION'];
 
-function switchTab(name) {
-  ['general','r1','r2','r3','r4'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display = t===name ? 'block':'none';
-  });
-  document.querySelectorAll('.tab').forEach((btn,i)=>{
-    const names=['general','r1','r2','r3','r4'];
-    btn.classList.toggle('active', names[i]===name);
-  });
+  document.getElementById('final-content').innerHTML=`
+    <div class="perfil-card"><div class="perfil-title">Tu perfil mental completo</div>${skillBars(G.skills)}</div>
+    <div class="insight-grid">
+      <div class="insight-card"><div class="insight-label f">💪 Tu mayor fortaleza</div><div class="insight-text">${SKILLS[top.k].name}: ${ins.f}</div></div>
+      <div class="insight-card"><div class="insight-label b">🎯 Tu zona de trabajo</div><div class="insight-text">${SKILLS[brecha.k].name}: ${insB.b}</div></div>
+    </div>
+    ${anclaReportHTML()}
+    <div class="next-step"><div class="next-step-title">⚡ Tu próximo paso esta semana</div><div class="next-step-text">${ins.a}</div></div>`;
+
+  document.getElementById('rfx1').textContent='¿El perfil que te mostró el juego coincide con cómo te ves vos mismo?';
+  document.getElementById('rfx2').textContent='¿Cuándo vas a usar tu ancla por primera vez en un partido real?';
+  document.getElementById('rfx3').textContent='¿Qué habilidad querés que tu entrenador te ayude a trabajar primero?';
+  show('final');
 }
 </script>
 </body>
